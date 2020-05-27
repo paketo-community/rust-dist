@@ -36,7 +36,7 @@ func testInstallRunner(t *testing.T, context spec.G, it spec.S) {
 			},
 		}
 		executable.On("Execute", execution).Return(nil)
-		runner = rust.NewInstallRunner(executable)
+		runner = rust.NewInstallRunner(executable, os.Stdout, os.Stderr)
 	})
 
 	it("runs the installer", func() {
@@ -59,7 +59,7 @@ func testInstallRunner(t *testing.T, context spec.G, it spec.S) {
 					},
 				}
 				executable.On("Execute", execution).Return(fmt.Errorf("expected"))
-				runner = rust.NewInstallRunner(executable)
+				runner = rust.NewInstallRunner(executable, os.Stdout, os.Stderr)
 			})
 
 			it("the error bubbles up", func() {

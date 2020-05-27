@@ -2,6 +2,7 @@ package rust
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -17,13 +18,17 @@ type Executable interface {
 
 // InstallerRunner can run the rust installer shell script
 type InstallerRunner struct {
-	exec Executable
+	exec   Executable
+	stdout io.Writer
+	stderr io.Writer
 }
 
 // NewInstallRunner creates a new InstallRunner with a given Executable
-func NewInstallRunner(exec Executable) InstallerRunner {
+func NewInstallRunner(exec Executable, stdout io.Writer, stderr io.Writer) InstallerRunner {
 	return InstallerRunner{
-		exec: exec,
+		exec:   exec,
+		stdout: stdout,
+		stderr: stderr,
 	}
 }
 
@@ -35,8 +40,8 @@ func (r InstallerRunner) Install(downloadDir string, destDir string, version str
 	os.Setenv("PATH", path)
 
 	return r.exec.Execute(pexec.Execution{
-		Stdout: os.Stdout, // TODO: wrap this and only show if something fails
-		Stderr: os.Stderr,
+		Stdout: r.stdout,
+		Stderr: r.stderr,
 		Dir:    extractedFiles,
 		Args: []string{
 			fmt.Sprintf("--prefix=%s", destDir),
