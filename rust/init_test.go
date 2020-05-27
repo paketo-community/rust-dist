@@ -10,6 +10,7 @@ import (
 func TestUnitRust(t *testing.T) {
 	suite := spec.New("rust", spec.Report(report.Terminal{}))
 	suite("Build", testBuild)
+	suite("Install Runner", testInstallRunner)
 	suite("LogEmitter", testLogEmitter)
 	suite("Detect", testDetect)
 	suite.Run(t)

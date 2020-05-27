@@ -16,8 +16,15 @@ type DependencyService interface {
 	Install(dependency postal.Dependency, cnbPath, layerPath string) error
 }
 
+//go:generate mockery -name Runner -case=underscore
+
+// Runner is something capable of running Cargo
+type Runner interface {
+	Install(downloadDir string, destDir string, version string) error
+}
+
 // Build does the actual install of Rust
-func Build(dependencies DependencyService, clock Clock, logger LogEmitter) packit.BuildFunc {
+func Build(dependencies DependencyService, runner Runner, clock Clock, logger LogEmitter) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title(context.BuildpackInfo)
 
@@ -26,7 +33,12 @@ func Build(dependencies DependencyService, clock Clock, logger LogEmitter) packi
 
 		entry := context.Plan.Entries[0]
 
-		rustLayer, err := context.Layers.Get("rust", packit.BuildLayer)
+		downloadLayer, err := context.Layers.Get("downloads")
+		if err != nil {
+			return packit.BuildResult{}, err
+		}
+
+		rustLayer, err := context.Layers.Get("rust", packit.BuildLayer, packit.CacheLayer)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
@@ -45,16 +57,25 @@ func Build(dependencies DependencyService, clock Clock, logger LogEmitter) packi
 
 		if sha, ok := rustLayer.Metadata["cache_sha"].(string); !ok || sha != dependency.SHA256 {
 			logger.Break()
-			logger.Process("Executing build process")
+			logger.Process("Installing Rust %s", dependency.Version)
 
 			err = rustLayer.Reset()
 			if err != nil {
 				return packit.BuildResult{}, err
 			}
 
-			logger.Subprocess("Installing Rust %s", dependency.Version)
+			logger.Subprocess("Downloading and extracting Rust")
 			then := clock.Now()
-			err = dependencies.Install(dependency, context.CNBPath, rustLayer.Path)
+			err = dependencies.Install(dependency, context.CNBPath, downloadLayer.Path)
+			if err != nil {
+				return packit.BuildResult{}, err
+			}
+			logger.Action("Completed in %s", time.Since(then).Round(time.Millisecond))
+			logger.Break()
+
+			logger.Subprocess("Installing Rust")
+			then = clock.Now()
+			err = runner.Install(downloadLayer.Path, rustLayer.Path, dependency.Version)
 			if err != nil {
 				return packit.BuildResult{}, err
 			}

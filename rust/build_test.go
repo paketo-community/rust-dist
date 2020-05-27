@@ -29,6 +29,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		timestamp  string
 
 		dependencyService *mocks.DependencyService
+		mockRunner        *mocks.Runner
 		clock             rust.Clock
 
 		build packit.BuildFunc
@@ -52,8 +53,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		timestamp = now.Format(time.RFC3339Nano)
 
 		logEmitter := rust.NewLogEmitter(ioutil.Discard)
+		mockRunner = &mocks.Runner{}
 
-		build = rust.Build(dependencyService, clock, logEmitter)
+		build = rust.Build(dependencyService, mockRunner, clock, logEmitter)
 	})
 
 	it.After(func() {
@@ -62,7 +64,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(os.RemoveAll(cnbPath)).To(Succeed())
 	})
 
-	it("builds rust", func() {
+	it("installs rust", func() {
 		dep := postal.Dependency{
 			ID:           "rust",
 			SHA256:       "some-sha",
@@ -79,7 +81,17 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			}),
 			"rust", "*", "some-stack",
 		).Return(dep, nil)
-		dependencyService.On("Install", dep, cnbPath, filepath.Join(layersDir, "rust")).Return(nil)
+		dependencyService.On("Install", dep, cnbPath, filepath.Join(layersDir, "downloads")).Return(nil)
+		mockRunner.On(
+			"Install",
+			mock.MatchedBy(func(s string) bool {
+				return strings.HasSuffix(s, "downloads")
+			}),
+			mock.MatchedBy(func(s string) bool {
+				return strings.HasSuffix(s, "rust")
+			}),
+			"1.43.1",
+		).Return(nil)
 
 		result, err := build(packit.BuildContext{
 			WorkingDir: workingDir,
@@ -101,6 +113,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					Name:      "rust",
 					Path:      filepath.Join(layersDir, "rust"),
 					Build:     true,
+					Cache:     true,
 					SharedEnv: packit.Environment{},
 					BuildEnv:  packit.Environment{},
 					LaunchEnv: packit.Environment{},
@@ -111,6 +124,63 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				},
 			},
 		}))
+	})
+
+	context("when rust was previously installed", func() {
+		it.Before(func() {
+			Expect(ioutil.WriteFile(filepath.Join(layersDir, "rust.toml"), []byte("launch = false\nbuild = true\ncache = true\n\n[metadata]\ncache_sha = \"some-sha\"\nbuilt_at = \"some_time\""), 0644)).To(Succeed())
+		})
+
+		it("skips the rust install", func() {
+			dep := postal.Dependency{
+				ID:           "rust",
+				SHA256:       "some-sha",
+				Source:       "some-source",
+				SourceSHA256: "some-source-sha",
+				Stacks:       []string{"some-stack"},
+				URI:          "some-uri",
+				Version:      "1.43.1",
+			}
+			dependencyService.On(
+				"Resolve",
+				mock.MatchedBy(func(s string) bool {
+					return strings.HasSuffix(s, "buildpack.toml")
+				}),
+				"rust", "*", "some-stack",
+			).Return(dep, nil)
+
+			result, err := build(packit.BuildContext{
+				WorkingDir: workingDir,
+				Layers:     packit.Layers{Path: layersDir},
+				CNBPath:    cnbPath,
+				Stack:      "some-stack",
+				Plan: packit.BuildpackPlan{
+					Entries: []packit.BuildpackPlanEntry{
+						{
+							Name: "rust",
+						},
+					},
+				},
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result).To(Equal(packit.BuildResult{
+				Layers: []packit.Layer{
+					{
+						Name:      "rust",
+						Path:      filepath.Join(layersDir, "rust"),
+						Build:     true,
+						Cache:     true,
+						SharedEnv: packit.Environment{},
+						BuildEnv:  packit.Environment{},
+						LaunchEnv: packit.Environment{},
+						Metadata: map[string]interface{}{
+							"built_at":  "some_time",
+							"cache_sha": "some-sha",
+						},
+					},
+				},
+			}))
+		})
 	})
 
 	context("when the entry contains a version constraint", func() {
@@ -131,7 +201,17 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				}),
 				"rust", "1.43.1", "some-stack",
 			).Return(dep, nil)
-			dependencyService.On("Install", dep, cnbPath, filepath.Join(layersDir, "rust")).Return(nil)
+			dependencyService.On("Install", dep, cnbPath, filepath.Join(layersDir, "downloads")).Return(nil)
+			mockRunner.On(
+				"Install",
+				mock.MatchedBy(func(s string) bool {
+					return strings.HasSuffix(s, "downloads")
+				}),
+				mock.MatchedBy(func(s string) bool {
+					return strings.HasSuffix(s, "rust")
+				}),
+				"1.43.1",
+			).Return(nil)
 
 			result, err := build(packit.BuildContext{
 				WorkingDir: workingDir,
@@ -154,6 +234,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 						Name:      "rust",
 						Path:      filepath.Join(layersDir, "rust"),
 						Build:     true,
+						Cache:     true,
 						SharedEnv: packit.Environment{},
 						BuildEnv:  packit.Environment{},
 						LaunchEnv: packit.Environment{},
