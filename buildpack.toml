@@ -25,9 +25,9 @@ api = "0.2"
     name = "Rust Standalone Installer"
     version = "1.44.1"
     uri = "https://static.rust-lang.org/dist/rust-1.44.1-x86_64-unknown-linux-gnu.tar.gz"
-    sha256 = "a41df89a461a580536aeb42755e43037556fba2e527dd13a1e1bb0749de28202  rust-1.44.1-x86_64-unknown-linux-gnu.tar.gz"
+    sha256 = "a41df89a461a580536aeb42755e43037556fba2e527dd13a1e1bb0749de28202"
     source = "https://static.rust-lang.org/dist/rustc-1.44.1-src.tar.gz"
-    source_256 = "7e2e64cb298dd5d5aea52eafe943ba0458fa82f2987fdcda1ff6f537b6f88473  rustc-1.44.1-src.tar.gz"
+    source_256 = "7e2e64cb298dd5d5aea52eafe943ba0458fa82f2987fdcda1ff6f537b6f88473"
     stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
 
   [[metadata.dependencies]]

@@ -23,8 +23,8 @@ if [ ! -f "rustc-$1-src.tar.gz" ]; then
 fi
 
 # Calculate Hashes
-BIN_HASH=$(shasum -a 256 "rust-$1-x86_64-unknown-linux-gnu.tar.gz")
-SRC_HASH=$(shasum -a 256 "rustc-$1-src.tar.gz")
+BIN_HASH=$(shasum -a 256 "rust-$1-x86_64-unknown-linux-gnu.tar.gz" | awk '{print $1}')
+SRC_HASH=$(shasum -a 256 "rustc-$1-src.tar.gz" | awk '{print $1}')
 
 cat <<EOF
   [[metadata.dependencies]]
