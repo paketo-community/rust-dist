@@ -25,7 +25,7 @@ file that looks like the following:
   # The version of the Rust dependency is not required. In the case it
   # is not specified, the buildpack will provide the latest stable version, 
   # which can be seen in the buildpack.toml file.
-  version = "1.46.0"
+  version = "1.47.0"
 ```
 
 ## Usage

@@ -3,7 +3,7 @@ api = "0.2"
 [buildpack]
   id = "com.mikusa.rust-dist"
   name = "Rust Distribution Build Pack"
-  version = "0.0.4"
+  version = "0.0.5"
   homepage = "https://github.com/dmikusa/rust-dist-cnb"
 
 [[stacks]]
@@ -23,19 +23,19 @@ api = "0.2"
   [[metadata.dependencies]]
     id = "rust"
     name = "Rust Standalone Installer"
-    version = "1.46.0"
-    uri = "https://static.rust-lang.org/dist/rust-1.46.0-x86_64-unknown-linux-gnu.tar.gz"
-    sha256 = "e3b98bc3440fe92817881933f9564389eccb396f5f431f33d48b979fa2fbdcf5"
-    source = "https://static.rust-lang.org/dist/rustc-1.46.0-src.tar.gz"
-    source_256 = "2d6a3b7196db474ba3f37b8f5d50a1ecedff00738d7846840605b42bfc922728"
+    version = "1.47.0"
+    uri = "https://static.rust-lang.org/dist/rust-1.47.0-x86_64-unknown-linux-gnu.tar.gz"
+    sha256 = "d0e11e1756a072e8e246b05d54593402813d047d12e44df281fbabda91035d96"
+    source = "https://static.rust-lang.org/dist/rustc-1.47.0-src.tar.gz"
+    source_256 = "3185df064c4747f2c8b9bb8c4468edd58ff4ad6d07880c879ac1b173b768d81d"
     stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
 
   [[metadata.dependencies]]
     id = "rust"
     name = "Rust Standalone Installer"
-    version = "1.45.2"
-    uri = "https://static.rust-lang.org/dist/rust-1.45.2-x86_64-unknown-linux-gnu.tar.gz"
-    sha256 = "860feed955726a4d96ffe40758a110053326b9ae11c9e1ee059e9c6222f25643"
-    source = "https://static.rust-lang.org/dist/rustc-1.45.2-src.tar.gz"
-    source_256 = "b7a3fc1e3ee367260ef945da867da0957f8983705f011ba2a73715375e50e308"
+    version = "1.46.0"
+    uri = "https://static.rust-lang.org/dist/rust-1.46.0-x86_64-unknown-linux-gnu.tar.gz"
+    sha256 = "e3b98bc3440fe92817881933f9564389eccb396f5f431f33d48b979fa2fbdcf5"
+    source = "https://static.rust-lang.org/dist/rustc-1.46.0-src.tar.gz"
+    source_256 = "2d6a3b7196db474ba3f37b8f5d50a1ecedff00738d7846840605b42bfc922728"
     stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
