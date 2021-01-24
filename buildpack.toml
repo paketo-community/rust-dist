@@ -3,7 +3,7 @@ api = "0.4"
 [buildpack]
   id = "com.mikusa.rust-dist"
   name = "Rust Distribution Build Pack"
-  version = "0.0.6"
+  version = "0.0.7"
   homepage = "https://github.com/dmikusa/rust-dist-cnb"
 
 [[stacks]]
@@ -20,7 +20,17 @@ api = "0.4"
   pre_package = "./scripts/build.sh"
 
   # from https://forge.rust-lang.org/infra/other-installation-methods.html#standalone
-    [[metadata.dependencies]]
+  [[metadata.dependencies]]
+    id = "rust"
+    name = "Rust Standalone Installer"
+    version = "1.49.0"
+    uri = "https://static.rust-lang.org/dist/rust-1.49.0-x86_64-unknown-linux-gnu.tar.gz"
+    sha256 = "8b14446df82f3707d69cf58fed92f18e0bff91621c62baf89288ef70e3e92981"
+    source = "https://static.rust-lang.org/dist/rustc-1.49.0-src.tar.gz"
+    source_256 = "b50aefa8df1fdfc9bccafdbf37aee611c8dfe81bf5648d5f43699c50289dc779"
+    stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
+
+  [[metadata.dependencies]]
     id = "rust"
     name = "Rust Standalone Installer"
     version = "1.48.0"
@@ -28,14 +38,4 @@ api = "0.4"
     sha256 = "950420a35b2dd9091f1b93a9ccd5abc026ca7112e667f246b1deb79204e2038b"
     source = "https://static.rust-lang.org/dist/rustc-1.48.0-src.tar.gz"
     source_256 = "0e763e6db47d5d6f91583284d2f989eacc49b84794d1443355b85c58d67ae43b"
-    stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
-
-  [[metadata.dependencies]]
-    id = "rust"
-    name = "Rust Standalone Installer"
-    version = "1.47.0"
-    uri = "https://static.rust-lang.org/dist/rust-1.47.0-x86_64-unknown-linux-gnu.tar.gz"
-    sha256 = "d0e11e1756a072e8e246b05d54593402813d047d12e44df281fbabda91035d96"
-    source = "https://static.rust-lang.org/dist/rustc-1.47.0-src.tar.gz"
-    source_256 = "3185df064c4747f2c8b9bb8c4468edd58ff4ad6d07880c879ac1b173b768d81d"
     stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
