@@ -12,7 +12,9 @@ import (
 	"github.com/dmikusa/rust-dist-cnb/rust"
 	"github.com/dmikusa/rust-dist-cnb/rust/mocks"
 	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/chronos"
 	"github.com/paketo-buildpacks/packit/postal"
+	"github.com/paketo-buildpacks/packit/scribe"
 	"github.com/sclevine/spec"
 	"github.com/stretchr/testify/mock"
 
@@ -30,7 +32,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		dependencyService *mocks.DependencyService
 		mockRunner        *mocks.Runner
-		clock             rust.Clock
 
 		build packit.BuildFunc
 	)
@@ -49,10 +50,12 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		dependencyService = &mocks.DependencyService{}
 
 		now := time.Now()
-		clock = rust.NewClock(func() time.Time { return now })
+		clock := chronos.NewClock(func() time.Time {
+			return now
+		})
 		timestamp = now.Format(time.RFC3339Nano)
 
-		logEmitter := rust.NewLogEmitter(ioutil.Discard)
+		logEmitter := scribe.NewEmitter(ioutil.Discard)
 		mockRunner = &mocks.Runner{}
 
 		build = rust.Build(dependencyService, mockRunner, clock, logEmitter)
@@ -221,8 +224,10 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				Plan: packit.BuildpackPlan{
 					Entries: []packit.BuildpackPlanEntry{
 						{
-							Name:    "rust",
-							Version: "1.43.1",
+							Name: "rust",
+							Metadata: map[string]interface{}{
+								"version": "1.43.1",
+							},
 						},
 					},
 				},
