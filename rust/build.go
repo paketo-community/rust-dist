@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/chronos"
 	"github.com/paketo-buildpacks/packit/postal"
+	"github.com/paketo-buildpacks/packit/scribe"
 )
 
 //go:generate mockery -name DependencyService -case=underscore
@@ -24,9 +26,9 @@ type Runner interface {
 }
 
 // Build does the actual install of Rust
-func Build(dependencies DependencyService, runner Runner, clock Clock, logger LogEmitter) packit.BuildFunc {
+func Build(dependencies DependencyService, runner Runner, clock chronos.Clock, logger scribe.Emitter) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
-		logger.Title(context.BuildpackInfo)
+		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 
 		logger.Process("Resolving Rust version")
 		logger.Candidates(context.Plan.Entries)
@@ -38,14 +40,14 @@ func Build(dependencies DependencyService, runner Runner, clock Clock, logger Lo
 			return packit.BuildResult{}, err
 		}
 
-		rustLayer, err := context.Layers.Get("rust", packit.BuildLayer, packit.CacheLayer)
+		rustLayer, err := context.Layers.Get("rust")
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
 
 		version := "*"
-		if entry.Version != "" {
-			version = entry.Version
+		if v, ok := entry.Metadata["version"].(string); ok {
+			version = v
 		}
 
 		dependency, err := dependencies.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), "rust", version, context.Stack)
@@ -53,16 +55,19 @@ func Build(dependencies DependencyService, runner Runner, clock Clock, logger Lo
 			return packit.BuildResult{}, err
 		}
 
-		logger.SelectedDependency(entry, dependency.Version)
+		logger.SelectedDependency(entry, dependency, clock.Now())
 
 		if sha, ok := rustLayer.Metadata["cache_sha"].(string); !ok || sha != dependency.SHA256 {
 			logger.Break()
 			logger.Process("Installing Rust %s", dependency.Version)
 
-			err = rustLayer.Reset()
+			rustLayer, err = rustLayer.Reset()
 			if err != nil {
 				return packit.BuildResult{}, err
 			}
+
+			rustLayer.Build = true
+			rustLayer.Cache = true
 
 			logger.Subprocess("Downloading and extracting Rust")
 			then := clock.Now()
