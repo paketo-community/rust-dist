@@ -1,10 +1,10 @@
 api = "0.4"
 
 [buildpack]
-  id = "com.mikusa.rust-dist"
-  name = "Rust Distribution Build Pack"
-  version = "0.0.7"
-  homepage = "https://github.com/dmikusa/rust-dist-cnb"
+  id = "paketo-community/rust-dist"
+  name = "Rust Distribution Buildpack"
+  version = "0.0.8"
+  homepage = "https://github.com/paketo-community/rust-dist"
 
 [[stacks]]
   id = "io.paketo.stacks.tiny"
@@ -23,6 +23,16 @@ api = "0.4"
   [[metadata.dependencies]]
     id = "rust"
     name = "Rust Standalone Installer"
+    version = "1.50.0"
+    uri = "https://static.rust-lang.org/dist/rust-1.50.0-x86_64-unknown-linux-gnu.tar.gz"
+    sha256 = "fa889b53918980aea2dea42bfae4e858dcb2104c6fdca6e4fe359f3a49767701"
+    source = "https://static.rust-lang.org/dist/rustc-1.50.0-src.tar.gz"
+    source_256 = "95978f8d02bb6175ae3238930baf03563c240aedf9a70bebdc3eaa2a8c3c5a5e"
+    stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
+
+  [[metadata.dependencies]]
+    id = "rust"
+    name = "Rust Standalone Installer"
     version = "1.49.0"
     uri = "https://static.rust-lang.org/dist/rust-1.49.0-x86_64-unknown-linux-gnu.tar.gz"
     sha256 = "8b14446df82f3707d69cf58fed92f18e0bff91621c62baf89288ef70e3e92981"
@@ -30,12 +40,3 @@ api = "0.4"
     source_256 = "b50aefa8df1fdfc9bccafdbf37aee611c8dfe81bf5648d5f43699c50289dc779"
     stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
 
-  [[metadata.dependencies]]
-    id = "rust"
-    name = "Rust Standalone Installer"
-    version = "1.48.0"
-    uri = "https://static.rust-lang.org/dist/rust-1.48.0-x86_64-unknown-linux-gnu.tar.gz"
-    sha256 = "950420a35b2dd9091f1b93a9ccd5abc026ca7112e667f246b1deb79204e2038b"
-    source = "https://static.rust-lang.org/dist/rustc-1.48.0-src.tar.gz"
-    source_256 = "0e763e6db47d5d6f91583284d2f989eacc49b84794d1443355b85c58d67ae43b"
-    stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
