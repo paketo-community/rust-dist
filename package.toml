@@ -1,2 +1,2 @@
 [buildpack]
-uri = "rust-dist-v0.0.8.tgz"
+uri = "build/buildpack.tgz"
