@@ -3,7 +3,6 @@ api = "0.4"
 [buildpack]
   id = "paketo-community/rust-dist"
   name = "Rust Distribution Buildpack"
-  version = "0.0.8"
   homepage = "https://github.com/paketo-community/rust-dist"
 
 [[stacks]]
@@ -16,8 +15,8 @@ api = "0.4"
   id = "org.cloudfoundry.stacks.cflinuxfs3"
 
 [metadata]
-  include_files = ["bin/build", "bin/detect", "buildpack.toml"]
-  pre_package = "./scripts/build.sh"
+  include-files = ["bin/build", "bin/detect", "buildpack.toml"]
+  pre-package = "./scripts/build.sh"
 
   # from https://forge.rust-lang.org/infra/other-installation-methods.html#standalone
   [[metadata.dependencies]]
