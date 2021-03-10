@@ -113,13 +113,14 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(result).To(Equal(packit.BuildResult{
 			Layers: []packit.Layer{
 				{
-					Name:      "rust",
-					Path:      filepath.Join(layersDir, "rust"),
-					Build:     true,
-					Cache:     true,
-					SharedEnv: packit.Environment{},
-					BuildEnv:  packit.Environment{},
-					LaunchEnv: packit.Environment{},
+					Name:             "rust",
+					Path:             filepath.Join(layersDir, "rust"),
+					Build:            true,
+					Cache:            true,
+					SharedEnv:        packit.Environment{},
+					BuildEnv:         packit.Environment{},
+					LaunchEnv:        packit.Environment{},
+					ProcessLaunchEnv: map[string]packit.Environment{},
 					Metadata: map[string]interface{}{
 						"built_at":  timestamp,
 						"cache_sha": "some-sha",
@@ -169,13 +170,14 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(result).To(Equal(packit.BuildResult{
 				Layers: []packit.Layer{
 					{
-						Name:      "rust",
-						Path:      filepath.Join(layersDir, "rust"),
-						Build:     true,
-						Cache:     true,
-						SharedEnv: packit.Environment{},
-						BuildEnv:  packit.Environment{},
-						LaunchEnv: packit.Environment{},
+						Name:             "rust",
+						Path:             filepath.Join(layersDir, "rust"),
+						Build:            true,
+						Cache:            true,
+						SharedEnv:        packit.Environment{},
+						BuildEnv:         packit.Environment{},
+						LaunchEnv:        packit.Environment{},
+						ProcessLaunchEnv: map[string]packit.Environment{},
 						Metadata: map[string]interface{}{
 							"built_at":  "some_time",
 							"cache_sha": "some-sha",
@@ -236,13 +238,14 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(result).To(Equal(packit.BuildResult{
 				Layers: []packit.Layer{
 					{
-						Name:      "rust",
-						Path:      filepath.Join(layersDir, "rust"),
-						Build:     true,
-						Cache:     true,
-						SharedEnv: packit.Environment{},
-						BuildEnv:  packit.Environment{},
-						LaunchEnv: packit.Environment{},
+						Name:             "rust",
+						Path:             filepath.Join(layersDir, "rust"),
+						Build:            true,
+						Cache:            true,
+						SharedEnv:        packit.Environment{},
+						BuildEnv:         packit.Environment{},
+						LaunchEnv:        packit.Environment{},
+						ProcessLaunchEnv: map[string]packit.Environment{},
 						Metadata: map[string]interface{}{
 							"built_at":  timestamp,
 							"cache_sha": "some-sha",
