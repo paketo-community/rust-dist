@@ -35,10 +35,10 @@ func Build(dependencies DependencyService, runner Runner, clock chronos.Clock, l
 
 		entry := context.Plan.Entries[0]
 
-		downloadLayer, err := context.Layers.Get("downloads")
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
+		// downloadLayer, err := context.Layers.Get("downloads")
+		// if err != nil {
+		// 	return packit.BuildResult{}, err
+		// }
 
 		rustLayer, err := context.Layers.Get("rust")
 		if err != nil {
@@ -71,21 +71,21 @@ func Build(dependencies DependencyService, runner Runner, clock chronos.Clock, l
 
 			logger.Subprocess("Downloading and extracting Rust")
 			then := clock.Now()
-			err = dependencies.Install(dependency, context.CNBPath, downloadLayer.Path)
+			err = dependencies.Install(dependency, context.CNBPath, rustLayer.Path)
 			if err != nil {
 				return packit.BuildResult{}, err
 			}
 			logger.Action("Completed in %s", time.Since(then).Round(time.Millisecond))
 			logger.Break()
 
-			logger.Subprocess("Installing Rust")
-			then = clock.Now()
-			err = runner.Install(downloadLayer.Path, rustLayer.Path, dependency.Version)
-			if err != nil {
-				return packit.BuildResult{}, err
-			}
-			logger.Action("Completed in %s", time.Since(then).Round(time.Millisecond))
-			logger.Break()
+			// logger.Subprocess("Installing Rust")
+			// then = clock.Now()
+			// err = runner.Install(downloadLayer.Path, rustLayer.Path, dependency.Version)
+			// if err != nil {
+			// 	return packit.BuildResult{}, err
+			// }
+			// logger.Action("Completed in %s", time.Since(then).Round(time.Millisecond))
+			// logger.Break()
 
 			rustLayer.Metadata = map[string]interface{}{
 				"built_at":  clock.Now().Format(time.RFC3339Nano),
