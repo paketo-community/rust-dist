@@ -12,31 +12,17 @@ api = "0.4"
 [[stacks]]
   id = "io.buildpacks.stacks.bionic"
 
-[[stacks]]
-  id = "org.cloudfoundry.stacks.cflinuxfs3"
-
 [metadata]
   include_files = ["bin/build", "bin/detect", "buildpack.toml"]
   pre_package = "./scripts/build.sh"
 
-  # from https://forge.rust-lang.org/infra/other-installation-methods.html#standalone
+  # from https://api.deps.paketo.io/v1/dependency?name=rust
   [[metadata.dependencies]]
     id = "rust"
-    name = "Rust Binaries"
+    name = "Rust"
     version = "1.50.0"
-    uri = "http://192.168.1.71:8000/rust.tgz"
-    sha256 = "b9625da7b43c3e385e2cf8bc704deba8ed4366fffb9ac383304637d669e5b52b"
+    uri = "https://deps.paketo.io/rust/rust_1.50.0_linux_noarch_bionic_fa9664c5.tgz"
+    sha256 = "fa9664c59f5f4bcc398588d4ee8f9ef5412ea6807ca33a1f530519099e720253"
     source = "https://static.rust-lang.org/dist/rustc-1.50.0-src.tar.gz"
     source_256 = "95978f8d02bb6175ae3238930baf03563c240aedf9a70bebdc3eaa2a8c3c5a5e"
-    stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
-
-  # [[metadata.dependencies]]
-  #   id = "rust"
-  #   name = "Rust Standalone Installer"
-  #   version = "1.49.0"
-  #   uri = "https://static.rust-lang.org/dist/rust-1.49.0-x86_64-unknown-linux-gnu.tar.gz"
-  #   sha256 = "8b14446df82f3707d69cf58fed92f18e0bff91621c62baf89288ef70e3e92981"
-  #   source = "https://static.rust-lang.org/dist/rustc-1.49.0-src.tar.gz"
-  #   source_256 = "b50aefa8df1fdfc9bccafdbf37aee611c8dfe81bf5648d5f43699c50289dc779"
-  #   stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
-
+    stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic"]

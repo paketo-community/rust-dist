@@ -31,7 +31,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		timestamp  string
 
 		dependencyService *mocks.DependencyService
-		mockRunner        *mocks.Runner
 
 		build packit.BuildFunc
 	)
@@ -56,9 +55,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		timestamp = now.Format(time.RFC3339Nano)
 
 		logEmitter := scribe.NewEmitter(ioutil.Discard)
-		mockRunner = &mocks.Runner{}
 
-		build = rust.Build(dependencyService, mockRunner, clock, logEmitter)
+		build = rust.Build(dependencyService, clock, logEmitter)
 	})
 
 	it.After(func() {
@@ -84,17 +82,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			}),
 			"rust", "*", "some-stack",
 		).Return(dep, nil)
-		dependencyService.On("Install", dep, cnbPath, filepath.Join(layersDir, "downloads")).Return(nil)
-		mockRunner.On(
-			"Install",
-			mock.MatchedBy(func(s string) bool {
-				return strings.HasSuffix(s, "downloads")
-			}),
-			mock.MatchedBy(func(s string) bool {
-				return strings.HasSuffix(s, "rust")
-			}),
-			"1.43.1",
-		).Return(nil)
+		dependencyService.On("Install", dep, cnbPath, filepath.Join(layersDir, "rust")).Return(nil)
 
 		result, err := build(packit.BuildContext{
 			WorkingDir: workingDir,
@@ -204,17 +192,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				}),
 				"rust", "1.43.1", "some-stack",
 			).Return(dep, nil)
-			dependencyService.On("Install", dep, cnbPath, filepath.Join(layersDir, "downloads")).Return(nil)
-			mockRunner.On(
-				"Install",
-				mock.MatchedBy(func(s string) bool {
-					return strings.HasSuffix(s, "downloads")
-				}),
-				mock.MatchedBy(func(s string) bool {
-					return strings.HasSuffix(s, "rust")
-				}),
-				"1.43.1",
-			).Return(nil)
+			dependencyService.On("Install", dep, cnbPath, filepath.Join(layersDir, "rust")).Return(nil)
 
 			result, err := build(packit.BuildContext{
 				WorkingDir: workingDir,

@@ -18,15 +18,8 @@ type DependencyService interface {
 	Install(dependency postal.Dependency, cnbPath, layerPath string) error
 }
 
-//go:generate mockery -name Runner -case=underscore
-
-// Runner is something capable of running Cargo
-type Runner interface {
-	Install(downloadDir string, destDir string, version string) error
-}
-
 // Build does the actual install of Rust
-func Build(dependencies DependencyService, runner Runner, clock chronos.Clock, logger scribe.Emitter) packit.BuildFunc {
+func Build(dependencies DependencyService, clock chronos.Clock, logger scribe.Emitter) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 
@@ -34,11 +27,6 @@ func Build(dependencies DependencyService, runner Runner, clock chronos.Clock, l
 		logger.Candidates(context.Plan.Entries)
 
 		entry := context.Plan.Entries[0]
-
-		// downloadLayer, err := context.Layers.Get("downloads")
-		// if err != nil {
-		// 	return packit.BuildResult{}, err
-		// }
 
 		rustLayer, err := context.Layers.Get("rust")
 		if err != nil {
@@ -77,15 +65,6 @@ func Build(dependencies DependencyService, runner Runner, clock chronos.Clock, l
 			}
 			logger.Action("Completed in %s", time.Since(then).Round(time.Millisecond))
 			logger.Break()
-
-			// logger.Subprocess("Installing Rust")
-			// then = clock.Now()
-			// err = runner.Install(downloadLayer.Path, rustLayer.Path, dependency.Version)
-			// if err != nil {
-			// 	return packit.BuildResult{}, err
-			// }
-			// logger.Action("Completed in %s", time.Since(then).Round(time.Millisecond))
-			// logger.Break()
 
 			rustLayer.Metadata = map[string]interface{}{
 				"built_at":  clock.Now().Format(time.RFC3339Nano),
