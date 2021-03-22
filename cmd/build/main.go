@@ -7,14 +7,15 @@ import (
 	"github.com/paketo-buildpacks/packit"
 	"github.com/paketo-buildpacks/packit/cargo"
 	"github.com/paketo-buildpacks/packit/chronos"
+	"github.com/paketo-buildpacks/packit/draft"
 	"github.com/paketo-buildpacks/packit/postal"
 	"github.com/paketo-buildpacks/packit/scribe"
 )
 
 func main() {
-	transport := cargo.NewTransport()
-	dependencyService := postal.NewService(transport)
 	logEmitter := scribe.NewEmitter(os.Stdout)
+	entryResolver := draft.NewPlanner()
+	dependencyService := postal.NewService(cargo.NewTransport())
 
-	packit.Build(rust.Build(dependencyService, chronos.DefaultClock, logEmitter))
+	packit.Build(rust.Build(entryResolver, dependencyService, chronos.DefaultClock, logEmitter))
 }

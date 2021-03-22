@@ -30,6 +30,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		cnbPath    string
 		timestamp  string
 
+		entryResolver     *mocks.EntryResolver
 		dependencyService *mocks.DependencyService
 
 		build packit.BuildFunc
@@ -48,6 +49,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		dependencyService = &mocks.DependencyService{}
 
+		entryResolver = &mocks.EntryResolver{}
+
 		now := time.Now()
 		clock := chronos.NewClock(func() time.Time {
 			return now
@@ -56,7 +59,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		logEmitter := scribe.NewEmitter(ioutil.Discard)
 
-		build = rust.Build(dependencyService, clock, logEmitter)
+		build = rust.Build(entryResolver, dependencyService, clock, logEmitter)
 	})
 
 	it.After(func() {
@@ -75,12 +78,18 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			URI:          "some-uri",
 			Version:      "1.43.1",
 		}
+
+		entry := packit.BuildpackPlanEntry{Name: "rust", Metadata: nil}
+		entries := []packit.BuildpackPlanEntry{entry}
+
+		entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
+
 		dependencyService.On(
 			"Resolve",
 			mock.MatchedBy(func(s string) bool {
 				return strings.HasSuffix(s, "buildpack.toml")
 			}),
-			"rust", "*", "some-stack",
+			"rust", "default", "some-stack",
 		).Return(dep, nil)
 		dependencyService.On("Install", dep, cnbPath, filepath.Join(layersDir, "rust")).Return(nil)
 
@@ -133,12 +142,18 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				URI:          "some-uri",
 				Version:      "1.43.1",
 			}
+
+			entry := packit.BuildpackPlanEntry{Name: "rust", Metadata: nil}
+			entries := []packit.BuildpackPlanEntry{entry}
+
+			entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
+
 			dependencyService.On(
 				"Resolve",
 				mock.MatchedBy(func(s string) bool {
 					return strings.HasSuffix(s, "buildpack.toml")
 				}),
-				"rust", "*", "some-stack",
+				"rust", "default", "some-stack",
 			).Return(dep, nil)
 
 			result, err := build(packit.BuildContext{
@@ -187,6 +202,17 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				URI:          "some-uri",
 				Version:      "1.43.1",
 			}
+
+			entry := packit.BuildpackPlanEntry{
+				Name: "rust",
+				Metadata: map[string]interface{}{
+					"version": "1.43.1",
+				},
+			}
+			entries := []packit.BuildpackPlanEntry{entry}
+
+			entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
+
 			dependencyService.On(
 				"Resolve",
 				mock.MatchedBy(func(s string) bool {
@@ -241,6 +267,29 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			})
 
 			it("returns an error", func() {
+				dep := postal.Dependency{
+					ID:           "rust",
+					SHA256:       "some-sha",
+					Source:       "some-source",
+					SourceSHA256: "some-source-sha",
+					Stacks:       []string{"some-stack"},
+					URI:          "some-uri",
+					Version:      "1.43.1",
+				}
+
+				entry := packit.BuildpackPlanEntry{Name: "rust", Metadata: nil}
+				entries := []packit.BuildpackPlanEntry{entry}
+
+				entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
+
+				dependencyService.On(
+					"Resolve",
+					mock.MatchedBy(func(s string) bool {
+						return strings.HasSuffix(s, "buildpack.toml")
+					}),
+					"rust", "default", "some-stack",
+				).Return(dep, nil)
+
 				_, err := build(packit.BuildContext{
 					WorkingDir: workingDir,
 					Layers:     packit.Layers{Path: layersDir},
@@ -263,11 +312,16 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					mock.MatchedBy(func(s string) bool {
 						return strings.HasSuffix(s, "buildpack.toml")
 					}),
-					"rust", "*", "some-stack",
+					"rust", "default", "some-stack",
 				).Return(postal.Dependency{}, errors.New("failed to resolve dependency"))
 			})
 
 			it("returns an error", func() {
+				entry := packit.BuildpackPlanEntry{Name: "rust", Metadata: nil}
+				entries := []packit.BuildpackPlanEntry{entry}
+
+				entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
+
 				_, err := build(packit.BuildContext{
 					WorkingDir: workingDir,
 					Layers:     packit.Layers{Path: layersDir},
@@ -290,11 +344,16 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					mock.MatchedBy(func(s string) bool {
 						return strings.HasSuffix(s, "buildpack.toml")
 					}),
-					"rust", "*", "some-stack",
+					"rust", "default", "some-stack",
 				).Return(postal.Dependency{}, errors.New("failed to install dependency"))
 			})
 
 			it("returns an error", func() {
+				entry := packit.BuildpackPlanEntry{Name: "rust", Metadata: nil}
+				entries := []packit.BuildpackPlanEntry{entry}
+
+				entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
+
 				_, err := build(packit.BuildContext{
 					WorkingDir: workingDir,
 					Layers:     packit.Layers{Path: layersDir},
