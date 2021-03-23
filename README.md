@@ -6,6 +6,14 @@ subsequent buildpacks. These buildpacks can then use that distribution to build
 Rust projects. The Rust Cargo CNB is an example of a buildpack that utilizes the Rust
 build tools.
 
+## Configuration
+
+### BP_RUST_VERSION
+
+As a user of the buildpack, you may specify which version of Rust gets installed by setting this environment variable at build time. The version you specify must exist in the `buildpack.toml` file or you will get an error.
+
+Ex: `pack build -e BP_RUST_VERSION=1.49.0 ...`
+
 ## Integration
 
 The Rust Dist CNB provides Rust as a dependency. Downstream buildpacks, like
