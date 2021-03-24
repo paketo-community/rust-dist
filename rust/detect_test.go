@@ -32,7 +32,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		Expect(os.RemoveAll(workingDir)).To(Succeed())
 	})
 
-	it("returns a DetectResult that provides rust", func() {
+	it("returns a plan that provides rust", func() {
 		result, err := detect(packit.DetectContext{
 			WorkingDir: workingDir,
 		})
@@ -45,4 +45,37 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 			},
 		}))
 	})
+
+	context("when BP_RUST_VERSION is set", func() {
+		it.Before(func() {
+			Expect(os.Setenv("BP_RUST_VERSION", "some-version")).To(Succeed())
+		})
+
+		it.After(func() {
+			Expect(os.Unsetenv("BP_RUST_VERSION")).To(Succeed())
+		})
+
+		it("returns a plan that provides rust and requires a specific version", func() {
+			result, err := detect(packit.DetectContext{
+				WorkingDir: workingDir,
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result).To(Equal(packit.DetectResult{
+				Plan: packit.BuildPlan{
+					Provides: []packit.BuildPlanProvision{
+						{Name: rust.PlanDependencyRust},
+					},
+					Requires: []packit.BuildPlanRequirement{
+						{
+							Name: rust.PlanDependencyRust,
+							Metadata: rust.BuildPlanMetadata{
+								VersionSource: "BP_RUST_VERSION",
+								Version:       "some-version",
+							},
+						},
+					},
+				},
+			}))
+		})
+	}, spec.Sequential())
 }

@@ -10,6 +10,13 @@ import (
 	"github.com/paketo-buildpacks/packit/scribe"
 )
 
+//go:generate mockery -name EntryResolver -case=underscore
+
+// EntryResolver for resolving buildpack plan entries
+type EntryResolver interface {
+	Resolve(name string, entries []packit.BuildpackPlanEntry, priorites []interface{}) (packit.BuildpackPlanEntry, []packit.BuildpackPlanEntry)
+}
+
 //go:generate mockery -name DependencyService -case=underscore
 
 // DependencyService interface for resolving and installing dependencies
@@ -18,32 +25,36 @@ type DependencyService interface {
 	Install(dependency postal.Dependency, cnbPath, layerPath string) error
 }
 
+// Priorities defines the order in which we select versions
+var Priorities = []interface{}{
+	"BP_RUST_VERSION",
+	"CARGO",
+}
+
 // Build does the actual install of Rust
-func Build(dependencies DependencyService, clock chronos.Clock, logger scribe.Emitter) packit.BuildFunc {
+func Build(entryResolver EntryResolver, dependencies DependencyService, clock chronos.Clock, logger scribe.Emitter) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 
 		logger.Process("Resolving Rust version")
-		logger.Candidates(context.Plan.Entries)
+		entry, entries := entryResolver.Resolve(PlanDependencyRust, context.Plan.Entries, Priorities)
+		logger.Candidates(entries)
 
-		entry := context.Plan.Entries[0]
-
-		rustLayer, err := context.Layers.Get("rust")
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
-
-		version := "*"
-		if v, ok := entry.Metadata["version"].(string); ok {
-			version = v
+		version, ok := entry.Metadata["version"].(string)
+		if !ok {
+			version = "default"
 		}
 
 		dependency, err := dependencies.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), "rust", version, context.Stack)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
-
 		logger.SelectedDependency(entry, dependency, clock.Now())
+
+		rustLayer, err := context.Layers.Get("rust")
+		if err != nil {
+			return packit.BuildResult{}, err
+		}
 
 		if sha, ok := rustLayer.Metadata["cache_sha"].(string); !ok || sha != dependency.SHA256 {
 			logger.Break()
