@@ -17,5 +17,8 @@ func main() {
 	entryResolver := draft.NewPlanner()
 	dependencyService := postal.NewService(cargo.NewTransport())
 
-	packit.Build(rust.Build(entryResolver, dependencyService, chronos.DefaultClock, logEmitter))
+	packit.Run(
+		rust.Detect(),
+		rust.Build(entryResolver, dependencyService, chronos.DefaultClock, logEmitter),
+	)
 }
