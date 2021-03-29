@@ -1,39 +1,18 @@
 #!/bin/sh
+# update the versions of rust being used in buildpack.toml
+#   requires `jq` and `yj` to be on the PATH
 set -e
 
-if [ -z "$1" ]; then
-    echo
-    echo "** A version is required"
-    echo
-    echo "./update_rust.sh <version>"
-    echo
-    exit -1
-fi
+# pull all the available versions of rust from the dep server
+#   - pick the first & second ones (assumes they are sorted most recent first)
+#   - remaps the name field to the id field and adds a name of "Rust"
+#   - removes some currently unused fields (.cpe,.created_at,.modified_at,.deprecation_date)
+#   - reformats stacks
+DEPS=$(curl -s "https://api.deps.paketo.io/v1/dependency?name=rust" | jq '[first, nth(1)] | map({"id": .name} + . + {"name": "Rust"}) | map(del(.cpe,.created_at,.modified_at,.deprecation_date)) | map(. + {"stacks": [.stacks[].id]})')
 
-mkdir -p .rust-bins
-cd .rust-bins/
-
-# Download
-if [ ! -f "rust-$1-x86_64-unknown-linux-gnu.tar.gz" ]; then
-    curl -L -O "https://static.rust-lang.org/dist/rust-$1-x86_64-unknown-linux-gnu.tar.gz"
-fi
-
-if [ ! -f "rustc-$1-src.tar.gz" ]; then
-    curl -L -O "https://static.rust-lang.org/dist/rustc-$1-src.tar.gz"
-fi
-
-# Calculate Hashes
-BIN_HASH=$(shasum -a 256 "rust-$1-x86_64-unknown-linux-gnu.tar.gz" | awk '{print $1}')
-SRC_HASH=$(shasum -a 256 "rustc-$1-src.tar.gz" | awk '{print $1}')
-
-cat <<EOF
-  [[metadata.dependencies]]
-    id = "rust"
-    name = "Rust Standalone Installer"
-    version = "$1"
-    uri = "https://static.rust-lang.org/dist/rust-$1-x86_64-unknown-linux-gnu.tar.gz"
-    sha256 = "$BIN_HASH"
-    source = "https://static.rust-lang.org/dist/rustc-$1-src.tar.gz"
-    source_256 = "$SRC_HASH"
-    stacks = ["io.paketo.stacks.tiny", "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
-EOF
+# Update buildpack.toml with the two most recent deps
+#   - delete the old deps section
+#   - add in the new one, uses --jsonargs to feed input from previous command
+#   - reformat to toml & update buildpack.toml
+OLD=$(yj -t < buildpack.toml)
+echo "$OLD" | jq --argjson DEPS "$DEPS" 'del(.metadata.dependencies) + {"metadata": (.metadata + {"dependencies": $DEPS})}' | yj -i -jt > buildpack.toml
