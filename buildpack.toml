@@ -15,6 +15,12 @@ api = "0.4"
   include-files = ["bin/run", "bin/build", "bin/detect", "buildpack.toml"]
   pre-package = "./scripts/build.sh"
 
+  [[metadata.configurations]]
+    name = "BP_RUST_VERSION"
+    description = "the Rust version"
+    default = "1.*"
+    build = true
+
   [[metadata.dependencies]]
     id = "rust"
     name = "Rust"
@@ -25,6 +31,14 @@ api = "0.4"
     source = "https://static.rust-lang.org/dist/rustc-1.51.0-src.tar.gz"
     source_sha256 = "7a6b9bafc8b3d81bbc566e7c0d1f17c9f499fd22b95142f7ea3a8e4d1f9eb847"
 
+    [[metadata.dependencies.licenses]]
+      type = "Apache-2.0"
+      uri = "http://www.apache.org/licenses/LICENSE-2.0"
+
+    [[metadata.dependencies.licenses]]
+      type = "MIT"
+      uri = "https://opensource.org/licenses/MIT"
+
   [[metadata.dependencies]]
     id = "rust"
     name = "Rust"
@@ -34,3 +48,11 @@ api = "0.4"
     stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny"]
     source = "https://static.rust-lang.org/dist/rustc-1.50.0-src.tar.gz"
     source_sha256 = "95978f8d02bb6175ae3238930baf03563c240aedf9a70bebdc3eaa2a8c3c5a5e"
+
+    [[metadata.dependencies.licenses]]
+      type = "Apache-2.0"
+      uri = "http://www.apache.org/licenses/LICENSE-2.0"
+
+    [[metadata.dependencies.licenses]]
+      type = "MIT"
+      uri = "https://opensource.org/licenses/MIT"
