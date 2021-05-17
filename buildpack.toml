@@ -24,12 +24,12 @@ api = "0.4"
   [[metadata.dependencies]]
     id = "rust"
     name = "Rust"
-    version = "1.51.0"
-    sha256 = "d8742ebfdaa7eba9c577b5f6cf0a0883fb52db09f66b73ac0afc3eaa536ce06d"
-    uri = "https://deps.paketo.io/rust/rust_1.51.0_linux_noarch_bionic_d8742ebf.tgz"
+    version = "1.52.1"
+    sha256 = "36c53fc4a300a9fa18bf8095b7073273d308e222b04cc4bae213265f5dc4c75f"
+    uri = "https://deps.paketo.io/rust/rust_1.52.1_linux_noarch_bionic_36c53fc4.tgz"
     stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny"]
-    source = "https://static.rust-lang.org/dist/rustc-1.51.0-src.tar.gz"
-    source_sha256 = "7a6b9bafc8b3d81bbc566e7c0d1f17c9f499fd22b95142f7ea3a8e4d1f9eb847"
+    source = "https://static.rust-lang.org/dist/rustc-1.52.1-src.tar.gz"
+    source_sha256 = "3a6f23a26d0e8f87abbfbf32c5cd7daa0c0b71d0986abefc56b9a5fbfbd0bf98"
 
     [[metadata.dependencies.licenses]]
       type = "Apache-2.0"
@@ -42,12 +42,12 @@ api = "0.4"
   [[metadata.dependencies]]
     id = "rust"
     name = "Rust"
-    version = "1.50.0"
-    sha256 = "fa9664c59f5f4bcc398588d4ee8f9ef5412ea6807ca33a1f530519099e720253"
-    uri = "https://deps.paketo.io/rust/rust_1.50.0_linux_noarch_bionic_fa9664c5.tgz"
+    version = "1.51.0"
+    sha256 = "d8742ebfdaa7eba9c577b5f6cf0a0883fb52db09f66b73ac0afc3eaa536ce06d"
+    uri = "https://deps.paketo.io/rust/rust_1.51.0_linux_noarch_bionic_d8742ebf.tgz"
     stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny"]
-    source = "https://static.rust-lang.org/dist/rustc-1.50.0-src.tar.gz"
-    source_sha256 = "95978f8d02bb6175ae3238930baf03563c240aedf9a70bebdc3eaa2a8c3c5a5e"
+    source = "https://static.rust-lang.org/dist/rustc-1.51.0-src.tar.gz"
+    source_sha256 = "7a6b9bafc8b3d81bbc566e7c0d1f17c9f499fd22b95142f7ea3a8e4d1f9eb847"
 
     [[metadata.dependencies.licenses]]
       type = "Apache-2.0"
