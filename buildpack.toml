@@ -1,4 +1,4 @@
-api = "0.6"
+api = "0.5"
 
 [buildpack]
   id = "paketo-community/rust-dist"
