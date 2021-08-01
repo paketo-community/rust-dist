@@ -1,43 +1,25 @@
 package rust
 
 import (
-	"os"
-
-	"github.com/paketo-buildpacks/packit"
+	"github.com/buildpacks/libcnb"
 )
 
-// PlanDependencyRust is the name of the plan
-const PlanDependencyRust = "rust"
+// PlanEntryRust is the name of the plan
+const PlanEntryRust = "rust"
 
-// BuildPlanMetadata defines the format of what is stored in the build plan's metadata section
-type BuildPlanMetadata struct {
-	Version       string `toml:"version"`
-	VersionSource string `toml:"version-source"`
+type Detect struct {
 }
 
 // Detect will always just offer (i.e. provides) Rust, but does not require it ever
-func Detect() packit.DetectFunc {
-	return func(context packit.DetectContext) (packit.DetectResult, error) {
-		var requirements []packit.BuildPlanRequirement
-
-		version := os.Getenv("BP_RUST_VERSION")
-		if version != "" {
-			requirements = append(requirements, packit.BuildPlanRequirement{
-				Name: PlanDependencyRust,
-				Metadata: BuildPlanMetadata{
-					Version:       version,
-					VersionSource: "BP_RUST_VERSION",
+func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
+	return libcnb.DetectResult{
+		Pass: true,
+		Plans: []libcnb.BuildPlan{
+			{
+				Provides: []libcnb.BuildPlanProvide{
+					{Name: PlanEntryRust},
 				},
-			})
-		}
-
-		return packit.DetectResult{
-			Plan: packit.BuildPlan{
-				Provides: []packit.BuildPlanProvision{
-					{Name: PlanDependencyRust},
-				},
-				Requires: requirements,
 			},
-		}, nil
-	}
+		},
+	}, nil
 }

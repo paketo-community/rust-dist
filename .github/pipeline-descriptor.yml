@@ -1,0 +1,3 @@
+codeowners:
+- path:  "*"
+  owner: "@paketo-community/rust-maintainers"

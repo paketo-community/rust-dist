@@ -1,92 +1,55 @@
 package rust
 
 import (
-	"path/filepath"
-	"time"
+	"fmt"
 
-	"github.com/paketo-buildpacks/packit"
-	"github.com/paketo-buildpacks/packit/chronos"
-	"github.com/paketo-buildpacks/packit/postal"
-	"github.com/paketo-buildpacks/packit/scribe"
+	"github.com/buildpacks/libcnb"
+	"github.com/paketo-buildpacks/libpak"
+	"github.com/paketo-buildpacks/libpak/bard"
 )
 
-//go:generate mockery -name EntryResolver -case=underscore
-
-// EntryResolver for resolving buildpack plan entries
-type EntryResolver interface {
-	Resolve(name string, entries []packit.BuildpackPlanEntry, priorites []interface{}) (packit.BuildpackPlanEntry, []packit.BuildpackPlanEntry)
+type Build struct {
+	Logger bard.Logger
 }
 
-//go:generate mockery -name DependencyService -case=underscore
+func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
+	b.Logger.Title(context.Buildpack)
+	result := libcnb.NewBuildResult()
 
-// DependencyService interface for resolving and installing dependencies
-type DependencyService interface {
-	Resolve(path, name, version, stack string) (postal.Dependency, error)
-	Install(dependency postal.Dependency, cnbPath, layerPath string) error
-}
+	pr := libpak.PlanEntryResolver{Plan: context.Plan}
 
-// Priorities defines the order in which we select versions
-var Priorities = []interface{}{
-	"BP_RUST_VERSION",
-	"CARGO",
-}
-
-// Build does the actual install of Rust
-func Build(entryResolver EntryResolver, dependencies DependencyService, clock chronos.Clock, logger scribe.Emitter) packit.BuildFunc {
-	return func(context packit.BuildContext) (packit.BuildResult, error) {
-		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
-
-		logger.Process("Resolving Rust version")
-		entry, entries := entryResolver.Resolve(PlanDependencyRust, context.Plan.Entries, Priorities)
-		logger.Candidates(entries)
-
-		version, ok := entry.Metadata["version"].(string)
-		if !ok {
-			version = "default"
-		}
-
-		dependency, err := dependencies.Resolve(filepath.Join(context.CNBPath, "buildpack.toml"), "rust", version, context.Stack)
+	if _, ok, err := pr.Resolve(PlanEntryRust); err != nil {
+		return libcnb.BuildResult{}, fmt.Errorf("unable to resolve Rust plan entry\n%w", err)
+	} else if ok {
+		dc, err := libpak.NewDependencyCache(context)
 		if err != nil {
-			return packit.BuildResult{}, err
+			return libcnb.BuildResult{}, fmt.Errorf("unable to create dependency cache\n%w", err)
 		}
-		logger.SelectedDependency(entry, dependency, clock.Now())
+		dc.Logger = b.Logger
 
-		rustLayer, err := context.Layers.Get("rust")
+		dr, err := libpak.NewDependencyResolver(context)
 		if err != nil {
-			return packit.BuildResult{}, err
+			return libcnb.BuildResult{}, fmt.Errorf("unable to create dependency resolver\n%w", err)
 		}
 
-		if sha, ok := rustLayer.Metadata["cache_sha"].(string); !ok || sha != dependency.SHA256 {
-			logger.Break()
-			logger.Process("Installing Rust %s", dependency.Version)
-
-			rustLayer, err = rustLayer.Reset()
-			if err != nil {
-				return packit.BuildResult{}, err
-			}
-
-			rustLayer.Build = true
-			rustLayer.Cache = true
-
-			logger.Subprocess("Downloading and extracting Rust")
-			then := clock.Now()
-			err = dependencies.Install(dependency, context.CNBPath, rustLayer.Path)
-			if err != nil {
-				return packit.BuildResult{}, err
-			}
-			logger.Action("Completed in %s", time.Since(then).Round(time.Millisecond))
-			logger.Break()
-
-			rustLayer.Metadata = map[string]interface{}{
-				"built_at":  clock.Now().Format(time.RFC3339Nano),
-				"cache_sha": dependency.SHA256,
-			}
+		cr, err := libpak.NewConfigurationResolver(context.Buildpack, &b.Logger)
+		if err != nil {
+			return libcnb.BuildResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
 		}
 
-		return packit.BuildResult{
-			Layers: []packit.Layer{
-				rustLayer,
-			},
-		}, nil
+		v, _ := cr.Resolve("BP_RUST_VERSION")
+
+		rustupDependency, err := dr.Resolve(PlanEntryRust, v)
+		if err != nil {
+			return libcnb.BuildResult{}, fmt.Errorf("unable to find dependency\n%w", err)
+		}
+
+		rustup, be := NewRust(rustupDependency, dc)
+		rustup.Logger = b.Logger
+
+		result.Layers = append(result.Layers, rustup)
+		result.BOM.Entries = append(result.BOM.Entries, be)
 	}
+
+	return result, nil
 }

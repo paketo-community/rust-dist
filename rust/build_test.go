@@ -1,372 +1,96 @@
+/*
+ * Copyright 2018-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package rust_test
 
 import (
-	"errors"
-	"io/ioutil"
 	"os"
-	"path/filepath"
-	"strings"
 	"testing"
-	"time"
 
-	"github.com/dmikusa/rust-dist-cnb/rust"
-	"github.com/dmikusa/rust-dist-cnb/rust/mocks"
-	"github.com/paketo-buildpacks/packit"
-	"github.com/paketo-buildpacks/packit/chronos"
-	"github.com/paketo-buildpacks/packit/postal"
-	"github.com/paketo-buildpacks/packit/scribe"
-	"github.com/sclevine/spec"
-	"github.com/stretchr/testify/mock"
-
+	"github.com/buildpacks/libcnb"
 	. "github.com/onsi/gomega"
+	"github.com/paketo-community/rust-dist/rust"
+	"github.com/sclevine/spec"
 )
 
 func testBuild(t *testing.T, context spec.G, it spec.S) {
 	var (
 		Expect = NewWithT(t).Expect
 
-		workingDir string
-		layersDir  string
-		cnbPath    string
-		timestamp  string
-
-		entryResolver     *mocks.EntryResolver
-		dependencyService *mocks.DependencyService
-
-		build packit.BuildFunc
+		ctx libcnb.BuildContext
 	)
 
-	it.Before(func() {
-		var err error
-		workingDir, err = ioutil.TempDir("", "working-dir")
-		Expect(err).NotTo(HaveOccurred())
-
-		layersDir, err = ioutil.TempDir("", "layers")
-		Expect(err).NotTo(HaveOccurred())
-
-		cnbPath, err = ioutil.TempDir("", "cnb-path")
-		Expect(err).NotTo(HaveOccurred())
-
-		dependencyService = &mocks.DependencyService{}
-
-		entryResolver = &mocks.EntryResolver{}
-
-		now := time.Now()
-		clock := chronos.NewClock(func() time.Time {
-			return now
-		})
-		timestamp = now.Format(time.RFC3339Nano)
-
-		logEmitter := scribe.NewEmitter(ioutil.Discard)
-
-		build = rust.Build(entryResolver, dependencyService, clock, logEmitter)
-	})
-
-	it.After(func() {
-		Expect(os.RemoveAll(workingDir)).To(Succeed())
-		Expect(os.RemoveAll(layersDir)).To(Succeed())
-		Expect(os.RemoveAll(cnbPath)).To(Succeed())
-	})
-
-	it("installs rust", func() {
-		dep := postal.Dependency{
-			ID:           "rust",
-			SHA256:       "some-sha",
-			Source:       "some-source",
-			SourceSHA256: "some-source-sha",
-			Stacks:       []string{"some-stack"},
-			URI:          "some-uri",
-			Version:      "1.43.1",
-		}
-
-		entry := packit.BuildpackPlanEntry{Name: "rust", Metadata: nil}
-		entries := []packit.BuildpackPlanEntry{entry}
-
-		entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
-
-		dependencyService.On(
-			"Resolve",
-			mock.MatchedBy(func(s string) bool {
-				return strings.HasSuffix(s, "buildpack.toml")
-			}),
-			"rust", "default", "some-stack",
-		).Return(dep, nil)
-		dependencyService.On("Install", dep, cnbPath, filepath.Join(layersDir, "rust")).Return(nil)
-
-		result, err := build(packit.BuildContext{
-			WorkingDir: workingDir,
-			Layers:     packit.Layers{Path: layersDir},
-			CNBPath:    cnbPath,
-			Stack:      "some-stack",
-			Plan: packit.BuildpackPlan{
-				Entries: []packit.BuildpackPlanEntry{
-					{
-						Name: "rust",
-					},
-				},
-			},
-		})
-		Expect(err).NotTo(HaveOccurred())
-		Expect(result).To(Equal(packit.BuildResult{
-			Layers: []packit.Layer{
+	it("contributes Rust", func() {
+		ctx.Plan.Entries = append(ctx.Plan.Entries, libcnb.BuildpackPlanEntry{Name: "rust"})
+		ctx.Buildpack.Metadata = map[string]interface{}{
+			"dependencies": []map[string]interface{}{
 				{
-					Name:             "rust",
-					Path:             filepath.Join(layersDir, "rust"),
-					Build:            true,
-					Cache:            true,
-					SharedEnv:        packit.Environment{},
-					BuildEnv:         packit.Environment{},
-					LaunchEnv:        packit.Environment{},
-					ProcessLaunchEnv: map[string]packit.Environment{},
-					Metadata: map[string]interface{}{
-						"built_at":  timestamp,
-						"cache_sha": "some-sha",
-					},
+					"id":      "rust",
+					"version": "1.1.1",
+					"stacks":  []interface{}{"test-stack-id"},
 				},
 			},
-		}))
+		}
+		ctx.StackID = "test-stack-id"
+
+		result, err := rust.Build{}.Build(ctx)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(result.Layers).To(HaveLen(1))
+		Expect(result.Layers[0].Name()).To(Equal("rust"))
+
+		Expect(result.BOM.Entries).To(HaveLen(1))
+		Expect(result.BOM.Entries[0].Name).To(Equal("rust"))
+		Expect(result.BOM.Entries[0].Launch).To(BeFalse())
+		Expect(result.BOM.Entries[0].Build).To(BeTrue())
 	})
 
-	context("when rust was previously installed", func() {
+	context("$BP_RUST_VERSION", func() {
 		it.Before(func() {
-			Expect(ioutil.WriteFile(filepath.Join(layersDir, "rust.toml"), []byte("launch = false\nbuild = true\ncache = true\n\n[metadata]\ncache_sha = \"some-sha\"\nbuilt_at = \"some_time\""), 0644)).To(Succeed())
+			Expect(os.Setenv("BP_RUST_VERSION", "1.1.1")).To(Succeed())
 		})
 
-		it("skips the rust install", func() {
-			dep := postal.Dependency{
-				ID:           "rust",
-				SHA256:       "some-sha",
-				Source:       "some-source",
-				SourceSHA256: "some-source-sha",
-				Stacks:       []string{"some-stack"},
-				URI:          "some-uri",
-				Version:      "1.43.1",
-			}
+		it.After(func() {
+			Expect(os.Unsetenv("BP_RUST_VERSION")).To(Succeed())
+		})
 
-			entry := packit.BuildpackPlanEntry{Name: "rust", Metadata: nil}
-			entries := []packit.BuildpackPlanEntry{entry}
-
-			entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
-
-			dependencyService.On(
-				"Resolve",
-				mock.MatchedBy(func(s string) bool {
-					return strings.HasSuffix(s, "buildpack.toml")
-				}),
-				"rust", "default", "some-stack",
-			).Return(dep, nil)
-
-			result, err := build(packit.BuildContext{
-				WorkingDir: workingDir,
-				Layers:     packit.Layers{Path: layersDir},
-				CNBPath:    cnbPath,
-				Stack:      "some-stack",
-				Plan: packit.BuildpackPlan{
-					Entries: []packit.BuildpackPlanEntry{
-						{
-							Name: "rust",
-						},
-					},
-				},
-			})
-			Expect(err).NotTo(HaveOccurred())
-			Expect(result).To(Equal(packit.BuildResult{
-				Layers: []packit.Layer{
+		it("selects versions based on BP_RUST_VERSION", func() {
+			ctx.Plan.Entries = append(ctx.Plan.Entries,
+				libcnb.BuildpackPlanEntry{Name: "rust"},
+			)
+			ctx.Buildpack.Metadata = map[string]interface{}{
+				"dependencies": []map[string]interface{}{
 					{
-						Name:             "rust",
-						Path:             filepath.Join(layersDir, "rust"),
-						Build:            true,
-						Cache:            true,
-						SharedEnv:        packit.Environment{},
-						BuildEnv:         packit.Environment{},
-						LaunchEnv:        packit.Environment{},
-						ProcessLaunchEnv: map[string]packit.Environment{},
-						Metadata: map[string]interface{}{
-							"built_at":  "some_time",
-							"cache_sha": "some-sha",
-						},
+						"id":      "rust",
+						"version": "1.1.1",
+						"stacks":  []interface{}{"test-stack-id"},
 					},
-				},
-			}))
-		})
-	})
-
-	context("when the entry contains a version constraint", func() {
-		it("builds rust with that version", func() {
-			dep := postal.Dependency{
-				ID:           "rust",
-				SHA256:       "some-sha",
-				Source:       "some-source",
-				SourceSHA256: "some-source-sha",
-				Stacks:       []string{"some-stack"},
-				URI:          "some-uri",
-				Version:      "1.43.1",
-			}
-
-			entry := packit.BuildpackPlanEntry{
-				Name: "rust",
-				Metadata: map[string]interface{}{
-					"version": "1.43.1",
-				},
-			}
-			entries := []packit.BuildpackPlanEntry{entry}
-
-			entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
-
-			dependencyService.On(
-				"Resolve",
-				mock.MatchedBy(func(s string) bool {
-					return strings.HasSuffix(s, "buildpack.toml")
-				}),
-				"rust", "1.43.1", "some-stack",
-			).Return(dep, nil)
-			dependencyService.On("Install", dep, cnbPath, filepath.Join(layersDir, "rust")).Return(nil)
-
-			result, err := build(packit.BuildContext{
-				WorkingDir: workingDir,
-				Layers:     packit.Layers{Path: layersDir},
-				CNBPath:    cnbPath,
-				Stack:      "some-stack",
-				Plan: packit.BuildpackPlan{
-					Entries: []packit.BuildpackPlanEntry{
-						{
-							Name: "rust",
-							Metadata: map[string]interface{}{
-								"version": "1.43.1",
-							},
-						},
-					},
-				},
-			})
-			Expect(err).NotTo(HaveOccurred())
-			Expect(result).To(Equal(packit.BuildResult{
-				Layers: []packit.Layer{
 					{
-						Name:             "rust",
-						Path:             filepath.Join(layersDir, "rust"),
-						Build:            true,
-						Cache:            true,
-						SharedEnv:        packit.Environment{},
-						BuildEnv:         packit.Environment{},
-						LaunchEnv:        packit.Environment{},
-						ProcessLaunchEnv: map[string]packit.Environment{},
-						Metadata: map[string]interface{}{
-							"built_at":  timestamp,
-							"cache_sha": "some-sha",
-						},
+						"id":      "rust",
+						"version": "2.2.2",
+						"stacks":  []interface{}{"test-stack-id"},
 					},
 				},
-			}))
-		})
-	})
+			}
+			ctx.StackID = "test-stack-id"
 
-	context("failure cases", func() {
-		context("when the rust layer cannot be retrieved", func() {
-			it.Before(func() {
-				Expect(ioutil.WriteFile(filepath.Join(layersDir, "rust.toml"), nil, 0000)).To(Succeed())
-			})
+			result, err := rust.Build{}.Build(ctx)
+			Expect(err).NotTo(HaveOccurred())
 
-			it("returns an error", func() {
-				dep := postal.Dependency{
-					ID:           "rust",
-					SHA256:       "some-sha",
-					Source:       "some-source",
-					SourceSHA256: "some-source-sha",
-					Stacks:       []string{"some-stack"},
-					URI:          "some-uri",
-					Version:      "1.43.1",
-				}
-
-				entry := packit.BuildpackPlanEntry{Name: "rust", Metadata: nil}
-				entries := []packit.BuildpackPlanEntry{entry}
-
-				entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
-
-				dependencyService.On(
-					"Resolve",
-					mock.MatchedBy(func(s string) bool {
-						return strings.HasSuffix(s, "buildpack.toml")
-					}),
-					"rust", "default", "some-stack",
-				).Return(dep, nil)
-
-				_, err := build(packit.BuildContext{
-					WorkingDir: workingDir,
-					Layers:     packit.Layers{Path: layersDir},
-					CNBPath:    cnbPath,
-					Stack:      "some-stack",
-					Plan: packit.BuildpackPlan{
-						Entries: []packit.BuildpackPlanEntry{
-							{Name: "rust"},
-						},
-					},
-				})
-				Expect(err).To(MatchError(ContainSubstring("permission denied")))
-			})
-		})
-
-		context("when the dependency cannot be resolved", func() {
-			it.Before(func() {
-				dependencyService.On(
-					"Resolve",
-					mock.MatchedBy(func(s string) bool {
-						return strings.HasSuffix(s, "buildpack.toml")
-					}),
-					"rust", "default", "some-stack",
-				).Return(postal.Dependency{}, errors.New("failed to resolve dependency"))
-			})
-
-			it("returns an error", func() {
-				entry := packit.BuildpackPlanEntry{Name: "rust", Metadata: nil}
-				entries := []packit.BuildpackPlanEntry{entry}
-
-				entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
-
-				_, err := build(packit.BuildContext{
-					WorkingDir: workingDir,
-					Layers:     packit.Layers{Path: layersDir},
-					CNBPath:    cnbPath,
-					Stack:      "some-stack",
-					Plan: packit.BuildpackPlan{
-						Entries: []packit.BuildpackPlanEntry{
-							{Name: "rust"},
-						},
-					},
-				})
-				Expect(err).To(MatchError("failed to resolve dependency"))
-			})
-		})
-
-		context("when the dependency cannot be installed", func() {
-			it.Before(func() {
-				dependencyService.On(
-					"Resolve",
-					mock.MatchedBy(func(s string) bool {
-						return strings.HasSuffix(s, "buildpack.toml")
-					}),
-					"rust", "default", "some-stack",
-				).Return(postal.Dependency{}, errors.New("failed to install dependency"))
-			})
-
-			it("returns an error", func() {
-				entry := packit.BuildpackPlanEntry{Name: "rust", Metadata: nil}
-				entries := []packit.BuildpackPlanEntry{entry}
-
-				entryResolver.On("Resolve", "rust", entries, rust.Priorities).Return(entry, entries)
-
-				_, err := build(packit.BuildContext{
-					WorkingDir: workingDir,
-					Layers:     packit.Layers{Path: layersDir},
-					CNBPath:    cnbPath,
-					Stack:      "some-stack",
-					Plan: packit.BuildpackPlan{
-						Entries: []packit.BuildpackPlanEntry{
-							{Name: "rust"},
-						},
-					},
-				})
-				Expect(err).To(MatchError("failed to install dependency"))
-			})
+			Expect(result.Layers[0].(rust.Rust).LayerContributor.Dependency.Version).To(Equal("1.1.1"))
 		})
 	})
 }
