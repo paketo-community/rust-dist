@@ -1,15 +1,13 @@
 api = "0.5"
 
 [buildpack]
+  homepage = "https://github.com/paketo-community/rust-dist"
   id = "paketo-community/rust-dist"
   name = "Rust Distribution Buildpack"
-  homepage = "https://github.com/paketo-community/rust-dist"
-  description = "A Cloud Native Buildpack that provides the Rust language build tools."
-  keywords    = ["rust", "rustc", "cargo", "tools"]
 
-[[buildpack.licenses]]
-  type = "Apache-2.0"
-  uri  = "https://github.com/paketo-community/rust-dist/blob/main/LICENSE"
+  [[buildpack.licenses]]
+    type = "Apache-2.0"
+    uri = "https://github.com/paketo-community/rust-dist/blob/main/LICENSE"
 
 [metadata]
   include-files = ["bin/run", "bin/build", "bin/detect", "buildpack.toml"]
@@ -24,24 +22,24 @@ api = "0.5"
   [[metadata.dependencies]]
     id = "rust"
     name = "Rust"
-    version = "1.54.0"
+    purl = "pkg:generic/rust@1.54.0?checksum=ac8511633e9b5a65ad030a1a2e5bdaa841fdfe3132f2baaa52cc04e71c6c6976&download_url=https://static.rust-lang.org/dist/rustc-1.54.0-src.tar.gz"
     sha256 = "63847be67cfa9f468279b6750d2a31beb6faf19c2eb1cdd6e0c9bc20b8ef0b54"
-    uri = "https://deps.paketo.io/rust/rust_1.54.0_linux_noarch_bionic_63847be6.tgz"
-    stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny", "*"]
     source = "https://static.rust-lang.org/dist/rustc-1.54.0-src.tar.gz"
     source_sha256 = "ac8511633e9b5a65ad030a1a2e5bdaa841fdfe3132f2baaa52cc04e71c6c6976"
-    purl = "pkg:generic/rust@1.54.0?checksum=ac8511633e9b5a65ad030a1a2e5bdaa841fdfe3132f2baaa52cc04e71c6c6976&download_url=https://static.rust-lang.org/dist/rustc-1.54.0-src.tar.gz"
+    stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny", "*"]
+    uri = "https://deps.paketo.io/rust/rust_1.54.0_linux_noarch_bionic_63847be6.tgz"
+    version = "1.54.0"
 
   [[metadata.dependencies]]
     id = "rust"
     name = "Rust"
-    version = "1.53.0"
+    purl = "pkg:generic/rust@1.53.0?checksum=5cf7ca39a10f6bf4e0b0bd15e3b9a61ce721f301e12d148262e5ba968ab825b9&download_url=https://static.rust-lang.org/dist/rustc-1.53.0-src.tar.gz"
     sha256 = "0d951e3835d3aac66871f7be3f39b5186c55b9b61419a84d030cf8b56ec1da1b"
-    uri = "https://deps.paketo.io/rust/rust_1.53.0_linux_noarch_bionic_0d951e38.tgz"
-    stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny", "*"]
     source = "https://static.rust-lang.org/dist/rustc-1.53.0-src.tar.gz"
     source_sha256 = "5cf7ca39a10f6bf4e0b0bd15e3b9a61ce721f301e12d148262e5ba968ab825b9"
-    purl = "pkg:generic/rust@1.53.0?checksum=5cf7ca39a10f6bf4e0b0bd15e3b9a61ce721f301e12d148262e5ba968ab825b9&download_url=https://static.rust-lang.org/dist/rustc-1.53.0-src.tar.gz"
+    stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny", "*"]
+    uri = "https://deps.paketo.io/rust/rust_1.53.0_linux_noarch_bionic_0d951e38.tgz"
+    version = "1.53.0"
 
 [[stacks]]
   id = "io.paketo.stacks.tiny"
