@@ -44,12 +44,12 @@ build = true
 [[metadata.dependencies]]
 id = "rust"
 name = "Rust"
-version = "1.54.0"
-sha256 = "63847be67cfa9f468279b6750d2a31beb6faf19c2eb1cdd6e0c9bc20b8ef0b54"
-uri = "https://deps.paketo.io/rust/rust_1.54.0_linux_noarch_bionic_63847be6.tgz"
+version = "1.55.0"
+sha256 = "8c32495663607d41d7f650c674a013b4cb59b84dbdcb94052581efb95e95cbb6"
+uri = "https://deps.paketo.io/rust/rust_1.55.0_linux_noarch_bionic_8c324956.tgz"
 stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny", "*"]
-source = "https://static.rust-lang.org/dist/rustc-1.54.0-src.tar.gz"
-source_sha256 = "ac8511633e9b5a65ad030a1a2e5bdaa841fdfe3132f2baaa52cc04e71c6c6976"
+source = "https://static.rust-lang.org/dist/rustc-1.55.0-src.tar.gz"
+source_sha256 = "b2379ac710f5f876ee3c3e03122fe33098d6765d371cac6c31b1b6fc8e43821e"
 
 [[metadata.dependencies.licenses]]
 type = "Apache-2.0"
@@ -62,12 +62,12 @@ uri  = "https://github.com/rust-lang/rust/blob/master/LICENSE-MIT"
 [[metadata.dependencies]]
 id = "rust"
 name = "Rust"
-version = "1.53.0"
-sha256 = "0d951e3835d3aac66871f7be3f39b5186c55b9b61419a84d030cf8b56ec1da1b"
-uri = "https://deps.paketo.io/rust/rust_1.53.0_linux_noarch_bionic_0d951e38.tgz"
+version = "1.54.0"
+sha256 = "63847be67cfa9f468279b6750d2a31beb6faf19c2eb1cdd6e0c9bc20b8ef0b54"
+uri = "https://deps.paketo.io/rust/rust_1.54.0_linux_noarch_bionic_63847be6.tgz"
 stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny", "*"]
-source = "https://static.rust-lang.org/dist/rustc-1.53.0-src.tar.gz"
-source_sha256 = "5cf7ca39a10f6bf4e0b0bd15e3b9a61ce721f301e12d148262e5ba968ab825b9"
+source = "https://static.rust-lang.org/dist/rustc-1.54.0-src.tar.gz"
+source_sha256 = "ac8511633e9b5a65ad030a1a2e5bdaa841fdfe3132f2baaa52cc04e71c6c6976"
 
 [[metadata.dependencies.licenses]]
 type = "Apache-2.0"
