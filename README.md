@@ -4,7 +4,9 @@ The Rust Dist Cloud Native Buildpack provides a Rust toolchain from a zip archiv
 
 ## Behavior
 
-This buildpack will participate if any of the following conditions are met
+This buildpack will always pass detection.
+
+This buildpack will participate during build if any of the following conditions are met
 
 * Another buildpack requires `rust`
 
