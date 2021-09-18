@@ -49,8 +49,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		result, err := rust.Build{}.Build(ctx)
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(result.Layers).To(HaveLen(1))
-		Expect(result.Layers[0].Name()).To(Equal("rust"))
+		Expect(result.Layers).To(HaveLen(2))
+		Expect(result.Layers[0].Name()).To(Equal("Cargo"))
+		Expect(result.Layers[1].Name()).To(Equal("rust"))
 
 		Expect(result.BOM.Entries).To(HaveLen(1))
 		Expect(result.BOM.Entries[0].Name).To(Equal("rust"))
@@ -90,7 +91,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			result, err := rust.Build{}.Build(ctx)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(result.Layers[0].(rust.Rust).LayerContributor.Dependency.Version).To(Equal("1.1.1"))
+			Expect(result.Layers[1].(rust.Rust).LayerContributor.Dependency.Version).To(Equal("1.1.1"))
 		})
 	})
 }

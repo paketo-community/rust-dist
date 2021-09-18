@@ -2,6 +2,8 @@ package rust
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
@@ -37,19 +39,34 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 			return libcnb.BuildResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
 		}
 
+		// make layer for cargo, which is installed by rust
+		cargo := Cargo{}
+		cargo.Logger = b.Logger
+		result.Layers = append(result.Layers, cargo)
+
+		// install rust
 		v, _ := cr.Resolve("BP_RUST_VERSION")
 
-		rustupDependency, err := dr.Resolve(PlanEntryRust, v)
+		rustDependency, err := dr.Resolve(PlanEntryRust, v)
 		if err != nil {
 			return libcnb.BuildResult{}, fmt.Errorf("unable to find dependency\n%w", err)
 		}
 
-		rustup, be := NewRust(rustupDependency, dc)
-		rustup.Logger = b.Logger
+		rust, be := NewRust(rustDependency, dc)
+		rust.Logger = b.Logger
 
-		result.Layers = append(result.Layers, rustup)
+		result.Layers = append(result.Layers, rust)
 		result.BOM.Entries = append(result.BOM.Entries, be)
 	}
 
 	return result, nil
+}
+
+func AppendToPath(values ...string) error {
+	var path []string
+	if curPath, ok := os.LookupEnv("PATH"); ok {
+		path = append(path, curPath)
+	}
+	path = append(path, values...)
+	return os.Setenv("PATH", strings.Join(path, string(os.PathListSeparator)))
 }
