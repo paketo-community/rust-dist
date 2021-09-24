@@ -27,8 +27,10 @@ func NewRust(dependency libpak.BuildpackDependency, cache libpak.DependencyCache
 		})
 	contributor.ExpectedMetadata = expected
 
-	// Rust is a build-time only dependency, but it statically compiles binaries so it
-	//  should be included in the launch time BOM so you know what version of Rust compiled the binaries
+	// This is a workaround. At the moment, there is no feasible way with pack to see the build BOM, you can only see
+    //   the launch BOM. We are including this dependency in the launch BOM for now to workaround this limitation.
+    // When https://github.com/buildpacks/pack/issues/1221 is resolved and one can easily access report.toml
+    //   we should remove this workaround.
 	be.Launch = true
 
 	return Rust{
