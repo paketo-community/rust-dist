@@ -55,7 +55,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		Expect(result.BOM.Entries).To(HaveLen(1))
 		Expect(result.BOM.Entries[0].Name).To(Equal("rust"))
-		Expect(result.BOM.Entries[0].Launch).To(BeFalse())
+		Expect(result.BOM.Entries[0].Launch).To(BeTrue())
 		Expect(result.BOM.Entries[0].Build).To(BeTrue())
 	})
 
