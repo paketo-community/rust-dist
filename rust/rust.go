@@ -27,6 +27,10 @@ func NewRust(dependency libpak.BuildpackDependency, cache libpak.DependencyCache
 		})
 	contributor.ExpectedMetadata = expected
 
+	// Rust is a build-time only dependency, but it statically compiles binaries so it
+	//  should be included in the launch time BOM so you know what version of Rust compiled the binaries
+	be.Launch = true
+
 	return Rust{
 		LayerContributor: contributor,
 	}, be
