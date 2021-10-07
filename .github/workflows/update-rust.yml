@@ -45,8 +45,8 @@ jobs:
               uses: docker://ghcr.io/paketo-buildpacks/actions/paketo-deps-dependency:main
               with:
                 name: rust
-            - id: buildpack
-              name: Update Buildpack Dependency
+            - name: Update Buildpack Dependency
+              id: buildpack
               run: |
                 #!/usr/bin/env bash
 
