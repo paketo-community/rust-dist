@@ -39,12 +39,12 @@ api = "0.6"
   [[metadata.dependencies]]
     id = "rust"
     name = "Rust"
-    sha256 = "2d9b113733c6681cd9b71b1df0fc679865ac0a87453a5f919aff138974425bb1"
+    sha256 = "4ad9ffac67e467658b7eca7ebffa0c8b7ad3b9702dca0efd6c228914da9bb3da"
     source = "https://static.rust-lang.org/dist/rustc-1.55.0-src.tar.gz"
     source_sha256 = "b2379ac710f5f876ee3c3e03122fe33098d6765d371cac6c31b1b6fc8e43821e"
     stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny", "*"]
-    uri = "https://deps.paketo.io/rust/rust_1.59.0_linux_noarch_bionic_2d9b1137.tgz"
-    version = "1.59.0"
+    uri = "https://deps.paketo.io/rust/rust_1.60.0_linux_noarch_bionic_4ad9ffac.tgz"
+    version = "1.60.0"
 
     [[metadata.dependencies.licenses]]
       type = "Apache-2.0"
