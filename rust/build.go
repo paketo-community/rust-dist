@@ -52,11 +52,9 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 			return libcnb.BuildResult{}, fmt.Errorf("unable to find dependency\n%w", err)
 		}
 
-		rust, be := NewRust(rustDependency, dc)
+		rust := NewRust(rustDependency, dc)
 		rust.Logger = b.Logger
-
 		result.Layers = append(result.Layers, rust)
-		result.BOM.Entries = append(result.BOM.Entries, be)
 	}
 
 	return result, nil
