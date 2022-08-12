@@ -38,16 +38,16 @@ api = "0.7"
     name = "BP_RUST_VERSION"
 
   [[metadata.dependencies]]
-    cpes = ["cpe:2.3:a:rust:rust:1.62.1:*:*:*:*:*:*:*"]
+    cpes = ["cpe:2.3:a:rust:rust:1.63.0:*:*:*:*:*:*:*"]
     id = "rust"
     name = "Rust"
-    purl = "pkg:generic/rust@1.62.1"
-    sha256 = "a9f0efa90162f8551401020a6c01e078367b2a77e74962af9542eab2354051a8"
+    purl = "pkg:generic/rust@1.63.0"
+    sha256 = "8ff4677ff8c6fc00682a877ebaa046c752d6465882fcbcdfbe20452b11f59243"
     source = "https://static.rust-lang.org/dist/rustc-1.61.0-src.tar.gz"
     source_sha256 = "b2379ac710f5f876ee3c3e03122fe33098d6765d371cac6c31b1b6fc8e43821e"
     stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny", "*"]
-    uri = "https://deps.paketo.io/rust/rust_1.62.1_linux_noarch_bionic_a9f0efa9.tgz"
-    version = "1.62.1"
+    uri = "https://deps.paketo.io/rust/rust_1.63.0_linux_noarch_bionic_8ff4677f.tgz"
+    version = "1.63.0"
 
     [[metadata.dependencies.licenses]]
       type = "Apache-2.0"
