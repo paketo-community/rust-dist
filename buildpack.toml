@@ -42,11 +42,11 @@ api = "0.7"
     id = "rust"
     name = "Rust"
     purl = "pkg:generic/rust@1.65.0"
-    sha256 = "ab25be4d2c3ad580dea968fba84f190b773adc993380cb65dd2a5d64d22614ea"
+    sha256 = "8f754fdd5af783fe9020978c64e414cb45f3ad0a6f44d045219bbf2210ca3cb9"
     source = "https://static.rust-lang.org/dist/rustc-1.64.0-src.tar.gz"
     source_sha256 = "b3cd9f481e1a2901bf6f3808d30c69cc4ea80d93c4cc4e2ed52258b180381205"
     stacks = ["io.buildpacks.stacks.bionic", "io.paketo.stacks.tiny", "*"]
-    uri = "https://deps.paketo.io/rust/rust_1.65.0_linux_noarch_bionic_ab25be4d.tgz"
+    uri = "https://static.rust-lang.org/dist/rust-1.65.0-x86_64-unknown-linux-gnu.tar.gz"
     version = "1.65.0"
 
     [[metadata.dependencies.licenses]]
