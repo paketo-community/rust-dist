@@ -195,7 +195,7 @@ jobs:
                     --format "${FORMAT}"
                 fi
               env:
-                PACKAGES: docker.io/paketobuildpacks/rust-dist gcr.io/paketo-buildpacks/rust-dist
+                PACKAGES: docker.io/paketocommunity/rust-dist gcr.io/paketo-community/rust-dist
                 PUBLISH: "true"
                 VERSION: ${{ steps.version.outputs.version }}
                 VERSION_MAJOR: ${{ steps.version.outputs.version-major }}
@@ -225,7 +225,7 @@ jobs:
             - if: ${{ true }}
               uses: docker://ghcr.io/buildpacks/actions/registry/request-add-entry:4.0.1
               with:
-                address: docker.io/paketobuildpacks/rust-dist@${{ steps.package.outputs.digest }}
+                address: docker.io/paketocommunity/rust-dist@${{ steps.package.outputs.digest }}
                 id: paketo-community/rust-dist
                 token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
                 version: ${{ steps.version.outputs.version }}
