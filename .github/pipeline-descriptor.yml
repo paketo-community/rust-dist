@@ -7,7 +7,7 @@ codeowners:
   owner: "@paketo-community/rust-maintainers"
 
 package:
-  repositories:   ["docker.io/paketobuildpacks/rust-dist","gcr.io/paketo-buildpacks/rust-dist"]
+  repositories:   ["docker.io/paketocommunity/rust-dist","gcr.io/paketo-community/rust-dist"]
   register:       true
   registry_token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
 
