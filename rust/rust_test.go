@@ -35,7 +35,7 @@ func testRust(t *testing.T, context spec.G, it spec.S) {
 		dep := libpak.BuildpackDependency{
 			Version: "1.54.0",
 			URI:     "https://localhost/stub-rust-1.54.0.tar.gz",
-			SHA256:  "e40a6ddb7d74d78a6d5557380160a174b1273813db1caf9b1f7bcbfe1578e818",
+			SHA256:  "2b61f788c000462840d4bf0f83f5ad3d552a8d27f364dd5f7e7e6b29031bee43",
 		}
 		dc := libpak.DependencyCache{CachePath: "testdata"}
 
@@ -53,6 +53,7 @@ func testRust(t *testing.T, context spec.G, it spec.S) {
 		Expect(layer.LayerTypes.Cache).To(BeTrue())
 
 		Expect(filepath.Join(layer.Path, "fixture-marker")).To(BeARegularFile())
+		Expect(filepath.Join(layer.Path, "bin")).To(BeADirectory())
 		Expect(layer.SBOMPath(libcnb.SyftJSON)).To(BeARegularFile())
 	})
 }
