@@ -3,6 +3,7 @@ package rust
 import (
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/buildpacks/libcnb"
 
@@ -36,7 +37,6 @@ func NewRust(dependency libpak.BuildpackDependency, cache libpak.DependencyCache
 
 func (j Rust) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	j.LayerContributor.Logger = j.Logger
-
 	return j.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
 		tempDir, err := os.MkdirTemp("", "rust")
 		if err != nil {
@@ -55,6 +55,9 @@ func (j Rust) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 			Stderr:  bard.NewWriter(j.Logger.Logger.InfoWriter(), bard.WithIndent(3)),
 		}); err != nil {
 			return libcnb.Layer{}, fmt.Errorf("unable to install rust: %w", err)
+		}
+		if err = os.RemoveAll(path.Join(layer.Path, "share")); err != nil {
+			return libcnb.Layer{}, fmt.Errorf("unable to trim rust installation: %w", err)
 		}
 		return layer, nil
 	})
