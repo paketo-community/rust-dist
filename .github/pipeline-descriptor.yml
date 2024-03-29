@@ -20,8 +20,18 @@ docker_credentials:
     password: ${{ secrets.PAKETO_BUILDPACKS_DOCKERHUB_PASSWORD }}
 
 dependencies:
-- id:   rust
+- name: Rust
+  id:   rust
   uses: docker://ghcr.io/paketo-buildpacks/actions/rust-dependency:main
   with:
     target: x86_64-unknown-linux-gnu
     token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+
+# ARM64
+- name: Rust ARM64
+  id:   rust
+  uses: docker://ghcr.io/paketo-buildpacks/actions/rust-dependency:main
+  with:
+    target: aarch64-unknown-linux-gnu
+    token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
+    arch: arm64

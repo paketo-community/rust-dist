@@ -1,4 +1,4 @@
-name: Update Rust
+name: Update Rust ARM64
 "on":
     schedule:
         - cron: 0 5 * * 1-5
@@ -27,7 +27,8 @@ jobs:
             - id: dependency
               uses: docker://ghcr.io/paketo-buildpacks/actions/rust-dependency:main
               with:
-                target: x86_64-unknown-linux-gnu
+                arch: arm64
+                target: aarch64-unknown-linux-gnu
                 token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
             - name: Update Buildpack Dependency
               id: buildpack
@@ -75,7 +76,7 @@ jobs:
                 echo "new-version=${VERSION}" >> "$GITHUB_OUTPUT"
                 echo "version-label=${LABEL}" >> "$GITHUB_OUTPUT"
               env:
-                ARCH: ""
+                ARCH: arm64
                 CPE: ${{ steps.dependency.outputs.cpe }}
                 CPE_PATTERN: ""
                 ID: rust
@@ -90,14 +91,14 @@ jobs:
             - uses: peter-evans/create-pull-request@v6
               with:
                 author: ${{ secrets.PAKETO_BUILDPACKS_DOCKERHUB_USERNAME }} <${{ secrets.PAKETO_BUILDPACKS_DOCKERHUB_USERNAME }}@users.noreply.github.com>
-                body: Bumps `Rust` from `${{ steps.buildpack.outputs.old-version }}` to `${{ steps.buildpack.outputs.new-version }}`.
-                branch: update/buildpack/rust
+                body: Bumps `Rust ARM64` from `${{ steps.buildpack.outputs.old-version }}` to `${{ steps.buildpack.outputs.new-version }}`.
+                branch: update/buildpack/rust-arm-64
                 commit-message: |-
-                    Bump Rust from ${{ steps.buildpack.outputs.old-version }} to ${{ steps.buildpack.outputs.new-version }}
+                    Bump Rust ARM64 from ${{ steps.buildpack.outputs.old-version }} to ${{ steps.buildpack.outputs.new-version }}
 
-                    Bumps Rust from ${{ steps.buildpack.outputs.old-version }} to ${{ steps.buildpack.outputs.new-version }}.
+                    Bumps Rust ARM64 from ${{ steps.buildpack.outputs.old-version }} to ${{ steps.buildpack.outputs.new-version }}.
                 delete-branch: true
                 labels: ${{ steps.buildpack.outputs.version-label }}, type:dependency-upgrade
                 signoff: true
-                title: Bump Rust from ${{ steps.buildpack.outputs.old-version }} to ${{ steps.buildpack.outputs.new-version }}
+                title: Bump Rust ARM64 from ${{ steps.buildpack.outputs.old-version }} to ${{ steps.buildpack.outputs.new-version }}
                 token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
