@@ -38,16 +38,16 @@ api = "0.7"
     name = "BP_RUST_VERSION"
 
   [[metadata.dependencies]]
-    cpes = ["cpe:2.3:a:rust:rust:1.81.0:*:*:*:*:*:*:*"]
+    cpes = ["cpe:2.3:a:rust:rust:1.82.0:*:*:*:*:*:*:*"]
     id = "rust"
     name = "Rust"
-    purl = "pkg:generic/rust@1.81.0?arch=amd64"
-    sha256 = "4ca7c24e573dae2f382d8d266babfddc307155e1a0a4025f3bc11db58a6cab3e"
-    source = "https://static.rust-lang.org/dist/rustc-1.81.0-src.tar.gz"
-    source-sha256 = "872448febdff32e50c3c90a7e15f9bb2db131d13c588fe9071b0ed88837ccfa7"
+    purl = "pkg:generic/rust@1.82.0?arch=amd64"
+    sha256 = "0265c08ae997c4de965048a244605fb1f24a600bbe35047b811c638b8fcf676b"
+    source = "https://static.rust-lang.org/dist/rustc-1.82.0-src.tar.gz"
+    source-sha256 = "7c53f4509eda184e174efa6ba7d5eeb586585686ce8edefc781a2b11a7cf512a"
     stacks = ["*"]
-    uri = "https://static.rust-lang.org/dist/rust-1.81.0-x86_64-unknown-linux-gnu.tar.gz"
-    version = "1.81.0"
+    uri = "https://static.rust-lang.org/dist/rust-1.82.0-x86_64-unknown-linux-gnu.tar.gz"
+    version = "1.82.0"
 
     [[metadata.dependencies.licenses]]
       type = "Apache-2.0"
