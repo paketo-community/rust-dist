@@ -1,4 +1,4 @@
-# `docker.io/paketo-community/rust-dist`
+# `paketo-community/rust-dist`
 
 The Rust Dist Cloud Native Buildpack provides a Rust toolchain from a zip archive distribution. The buildpack installs the Rust toolchain onto the `$PATH` which makes it available for subsequent buildpacks to consume. Subsequent buildpacks can then use the toolchain to build Rust projects. The Rust Cargo CNB is an example of a buildpack that utilizes a Rust toolchain.
 
