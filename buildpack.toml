@@ -58,16 +58,16 @@ api = "0.7"
       uri = "https://github.com/rust-lang/rust/blob/master/LICENSE-MIT"
 
   [[metadata.dependencies]]
-    cpes = ["cpe:2.3:a:rust:rust:1.89.0:*:*:*:*:*:*:*"]
+    cpes = ["cpe:2.3:a:rust:rust:1.90.0:*:*:*:*:*:*:*"]
     id = "rust"
     name = "Rust"
-    purl = "pkg:generic/rust@1.89.0?arch=arm64"
-    sha256 = "26d6de84ac59da702aa8c2f903e3c344e3259da02e02ce92ad1c735916b29a4a"
-    source = "https://static.rust-lang.org/dist/rustc-1.89.0-src.tar.gz"
-    source-sha256 = "2576f9f440dd99b0151bd28f59aa0ac6102d5c4f3ed4ef8a810c8dd05057250d"
+    purl = "pkg:generic/rust@1.90.0?arch=arm64"
+    sha256 = "293f412e3412c3aa3398c78ebbdf898fa08eacad80c85a7332ce1a455504c5fc"
+    source = "https://static.rust-lang.org/dist/rustc-1.90.0-src.tar.gz"
+    source-sha256 = "799a9f9cba4ed5351e071048bcf6b5560755d9009648def33a407dd4961f9b7e"
     stacks = ["*"]
-    uri = "https://static.rust-lang.org/dist/rust-1.89.0-aarch64-unknown-linux-gnu.tar.gz"
-    version = "1.89.0"
+    uri = "https://static.rust-lang.org/dist/rust-1.90.0-aarch64-unknown-linux-gnu.tar.gz"
+    version = "1.90.0"
 
     [[metadata.dependencies.licenses]]
       type = "Apache-2.0"
