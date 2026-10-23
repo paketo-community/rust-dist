@@ -1,7 +1,7 @@
 package rust_test
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -23,7 +23,7 @@ func testRust(t *testing.T, context spec.G, it spec.S) {
 	it.Before(func() {
 		var err error
 
-		ctx.Layers.Path, err = ioutil.TempDir("", "rust-layers")
+		ctx.Layers.Path, err = os.MkdirTemp("", "rust-layers")
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -40,7 +40,7 @@ func testRust(t *testing.T, context spec.G, it spec.S) {
 		dc := libpak.DependencyCache{CachePath: "testdata"}
 
 		j := rust.NewRust(dep, dc)
-		j.Logger = bard.NewLogger(ioutil.Discard)
+		j.Logger = bard.NewLogger(io.Discard)
 
 		layer, err := ctx.Layers.Layer("test-layer")
 		Expect(err).NotTo(HaveOccurred())
