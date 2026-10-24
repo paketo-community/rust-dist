@@ -51,8 +51,8 @@ func (j Rust) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 			Command: "./install.sh",
 			Args:    []string{fmt.Sprintf("--prefix=%s", layer.Path), "--disable-ldconfig"},
 			Dir:     tempDir,
-			Stdout:  bard.NewWriter(j.Logger.Logger.InfoWriter(), bard.WithIndent(3)),
-			Stderr:  bard.NewWriter(j.Logger.Logger.InfoWriter(), bard.WithIndent(3)),
+			Stdout:  bard.NewWriter(j.Logger.InfoWriter(), bard.WithIndent(3)),
+			Stderr:  bard.NewWriter(j.Logger.InfoWriter(), bard.WithIndent(3)),
 		}); err != nil {
 			return libcnb.Layer{}, fmt.Errorf("unable to install rust: %w", err)
 		}

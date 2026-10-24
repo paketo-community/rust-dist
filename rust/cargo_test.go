@@ -18,7 +18,6 @@ package rust_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -38,7 +37,7 @@ func testCargo(t *testing.T, context spec.G, it spec.S) {
 	it.Before(func() {
 		var err error
 
-		ctx.Layers.Path, err = ioutil.TempDir("", "cargo-layers")
+		ctx.Layers.Path, err = os.MkdirTemp("", "cargo-layers")
 		Expect(err).NotTo(HaveOccurred())
 	})
 

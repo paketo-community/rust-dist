@@ -28,8 +28,8 @@ api = "0.7"
     uri = "https://github.com/paketo-community/rust-dist/blob/main/LICENSE"
 
 [metadata]
-  include-files = ["LICENSE", "NOTICE", "README.md", "buildpack.toml", "linux/amd64/bin/build", "linux/amd64/bin/detect", "linux/amd64/bin/main", "linux/arm64/bin/build", "linux/arm64/bin/detect", "linux/arm64/bin/main"]
-  pre-package = "scripts/build.sh"
+  include-files = ["LICENSE", "NOTICE", "README.md", "buildpack.toml", "linux/amd64/bin/build", "linux/amd64/bin/detect", "linux/amd64/bin/run", "linux/arm64/bin/build", "linux/arm64/bin/detect", "linux/arm64/bin/run"]
+  pre-package = "scripts/build.sh --target linux/amd64 --target linux/arm64"
 
   [[metadata.configurations]]
     build = true
@@ -38,13 +38,16 @@ api = "0.7"
     name = "BP_RUST_VERSION"
 
   [[metadata.dependencies]]
-    cpes = ["cpe:2.3:a:rust:rust:1.99.1:*:*:*:*:*:*:*"]
+    arch = "amd64"
+    checksum = "sha256:aded4e6c1d580415e7b594a3080d8e23e9cbe06f159f97e300aa6875211f71bf"
+    cpe = "cpe:2.3:a:rust:rust:1.99.1:*:*:*:*:*:*:*"
     id = "rust"
     name = "Rust"
-    purl = "pkg:generic/rust@1.99.1?arch=amd64"
+    os = "linux"
+    purl = "pkg:generic/rust@1.99.1?arch=amd64&checksum=aded4e6c1d580415e7b594a3080d8e23e9cbe06f159f97e300aa6875211f71bf&download_url=https://static.rust-lang.org/dist/rust-1.99.1-x86_64-unknown-linux-gnu.tar.gz"
     sha256 = "aded4e6c1d580415e7b594a3080d8e23e9cbe06f159f97e300aa6875211f71bf"
     source = "https://static.rust-lang.org/dist/rustc-1.99.1-src.tar.gz"
-    source-sha256 = "db56bbc64db491ceda6b78a2811a6d121c639338906fd944f720289cbd02245c"
+    source-checksum = "sha256:db56bbc64db491ceda6b78a2811a6d121c639338906fd944f720289cbd02245c"
     stacks = ["*"]
     uri = "https://static.rust-lang.org/dist/rust-1.99.1-x86_64-unknown-linux-gnu.tar.gz"
     version = "1.99.1"
@@ -58,13 +61,16 @@ api = "0.7"
       uri = "https://github.com/rust-lang/rust/blob/master/LICENSE-MIT"
 
   [[metadata.dependencies]]
-    cpes = ["cpe:2.3:a:rust:rust:1.99.1:*:*:*:*:*:*:*"]
+    arch = "arm64"
+    checksum = "sha256:703b190f0d723ae68985797f3bb5f62f01b1723f138464c6f30f32b766eb0abf"
+    cpe = "cpe:2.3:a:rust:rust:1.99.1:*:*:*:*:*:*:*"
     id = "rust"
     name = "Rust"
-    purl = "pkg:generic/rust@1.99.1?arch=arm64"
+    os = "linux"
+    purl = "pkg:generic/rust@1.99.1?arch=arm64&checksum=703b190f0d723ae68985797f3bb5f62f01b1723f138464c6f30f32b766eb0abf&download_url=https://static.rust-lang.org/dist/rust-1.99.1-aarch64-unknown-linux-gnu.tar.gz"
     sha256 = "703b190f0d723ae68985797f3bb5f62f01b1723f138464c6f30f32b766eb0abf"
     source = "https://static.rust-lang.org/dist/rustc-1.99.1-src.tar.gz"
-    source-sha256 = "db56bbc64db491ceda6b78a2811a6d121c639338906fd944f720289cbd02245c"
+    source-checksum = "sha256:db56bbc64db491ceda6b78a2811a6d121c639338906fd944f720289cbd02245c"
     stacks = ["*"]
     uri = "https://static.rust-lang.org/dist/rust-1.99.1-aarch64-unknown-linux-gnu.tar.gz"
     version = "1.99.1"
@@ -76,6 +82,11 @@ api = "0.7"
     [[metadata.dependencies.licenses]]
       type = "MIT"
       uri = "https://github.com/rust-lang/rust/blob/master/LICENSE-MIT"
+
+  [[metadata.dependency-constraints]]
+    constraint = "1.*"
+    id = "rust"
+    patches = 2
 
 [[stacks]]
   id = "*"

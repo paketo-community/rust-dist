@@ -33,7 +33,9 @@ type Cargo struct {
 func (c Cargo) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	c.Logger.Headerf("%s: %s to layer", color.BlueString(c.Name()), color.YellowString("Contributing"))
 
-	AppendToPath(filepath.Join(layer.Path, "bin"))
+	if err := AppendToPath(filepath.Join(layer.Path, "bin")); err != nil {
+		return libcnb.Layer{}, fmt.Errorf("unable to set $PATH\n%w", err)
+	}
 
 	if err := os.Setenv("CARGO_HOME", layer.Path); err != nil {
 		return libcnb.Layer{}, fmt.Errorf("unable to set $CARGO_HOME\n%w", err)
