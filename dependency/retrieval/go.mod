@@ -1,6 +1,6 @@
 module github.com/paketo-community/rust-dist/dependency/retrieval
 
-go 1.27.2
+go 1.27.3
 
 require (
 	github.com/paketo-buildpacks/libdependency v0.2.1
